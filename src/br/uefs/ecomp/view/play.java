@@ -5,11 +5,16 @@
  */
 package br.uefs.ecomp.view;
 
+import br.ecomp.uefs.util.Tempo;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  *
@@ -23,6 +28,8 @@ public class play extends javax.swing.JDialog {
     //Lista com todos os botões que representam as letras do jogo.
     LinkedList<JButton> butt = new LinkedList<>();
     
+    private Timer timer;
+    
     /**
      * Creates new form play
      */
@@ -30,6 +37,7 @@ public class play extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         gerarLetras();
+        timer();
     }
     
     /**
@@ -65,6 +73,7 @@ public class play extends javax.swing.JDialog {
         jScrollPane1 = new javax.swing.JScrollPane();
         palavras = new javax.swing.JTextArea();
         jLabel1 = new javax.swing.JLabel();
+        tempo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Boggle");
@@ -73,7 +82,7 @@ public class play extends javax.swing.JDialog {
         jPanel1.setBackground(new java.awt.Color(255, 102, 0));
 
         b1.setBackground(new java.awt.Color(2, 2, 23));
-        b1.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b1.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b1.setForeground(new java.awt.Color(255, 255, 255));
         b1.setText("A");
         b1.addActionListener(new java.awt.event.ActionListener() {
@@ -83,7 +92,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b2.setBackground(new java.awt.Color(2, 2, 23));
-        b2.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b2.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b2.setForeground(new java.awt.Color(255, 255, 255));
         b2.setText("A");
         b2.addActionListener(new java.awt.event.ActionListener() {
@@ -93,7 +102,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b3.setBackground(new java.awt.Color(2, 2, 23));
-        b3.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b3.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b3.setForeground(new java.awt.Color(255, 255, 255));
         b3.setText("A");
         b3.addActionListener(new java.awt.event.ActionListener() {
@@ -103,7 +112,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b4.setBackground(new java.awt.Color(2, 2, 23));
-        b4.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b4.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b4.setForeground(new java.awt.Color(255, 255, 255));
         b4.setText("A");
         b4.addActionListener(new java.awt.event.ActionListener() {
@@ -113,7 +122,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b5.setBackground(new java.awt.Color(2, 2, 23));
-        b5.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b5.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b5.setForeground(new java.awt.Color(255, 255, 255));
         b5.setText("A");
         b5.addActionListener(new java.awt.event.ActionListener() {
@@ -123,7 +132,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b6.setBackground(new java.awt.Color(2, 2, 23));
-        b6.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b6.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b6.setForeground(new java.awt.Color(255, 255, 255));
         b6.setText("A");
         b6.addActionListener(new java.awt.event.ActionListener() {
@@ -133,7 +142,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b7.setBackground(new java.awt.Color(2, 2, 23));
-        b7.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b7.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b7.setForeground(new java.awt.Color(255, 255, 255));
         b7.setText("A");
         b7.addActionListener(new java.awt.event.ActionListener() {
@@ -143,7 +152,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b8.setBackground(new java.awt.Color(2, 2, 23));
-        b8.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b8.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b8.setForeground(new java.awt.Color(255, 255, 255));
         b8.setText("A");
         b8.addActionListener(new java.awt.event.ActionListener() {
@@ -153,7 +162,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b9.setBackground(new java.awt.Color(2, 2, 23));
-        b9.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b9.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b9.setForeground(new java.awt.Color(255, 255, 255));
         b9.setText("A");
         b9.addActionListener(new java.awt.event.ActionListener() {
@@ -163,7 +172,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b10.setBackground(new java.awt.Color(2, 2, 23));
-        b10.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b10.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b10.setForeground(new java.awt.Color(255, 255, 255));
         b10.setText("A");
         b10.addActionListener(new java.awt.event.ActionListener() {
@@ -173,7 +182,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b11.setBackground(new java.awt.Color(2, 2, 23));
-        b11.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b11.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b11.setForeground(new java.awt.Color(255, 255, 255));
         b11.setText("A");
         b11.addActionListener(new java.awt.event.ActionListener() {
@@ -183,7 +192,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b12.setBackground(new java.awt.Color(2, 2, 23));
-        b12.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b12.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b12.setForeground(new java.awt.Color(255, 255, 255));
         b12.setText("A");
         b12.addActionListener(new java.awt.event.ActionListener() {
@@ -193,7 +202,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b13.setBackground(new java.awt.Color(2, 2, 23));
-        b13.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b13.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b13.setForeground(new java.awt.Color(255, 255, 255));
         b13.setText("A");
         b13.addActionListener(new java.awt.event.ActionListener() {
@@ -203,7 +212,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b14.setBackground(new java.awt.Color(2, 2, 23));
-        b14.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b14.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b14.setForeground(new java.awt.Color(255, 255, 255));
         b14.setText("A");
         b14.addActionListener(new java.awt.event.ActionListener() {
@@ -213,7 +222,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b15.setBackground(new java.awt.Color(2, 2, 23));
-        b15.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b15.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b15.setForeground(new java.awt.Color(255, 255, 255));
         b15.setText("A");
         b15.addActionListener(new java.awt.event.ActionListener() {
@@ -223,7 +232,7 @@ public class play extends javax.swing.JDialog {
         });
 
         b16.setBackground(new java.awt.Color(2, 2, 23));
-        b16.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        b16.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         b16.setForeground(new java.awt.Color(255, 255, 255));
         b16.setText("A");
         b16.addActionListener(new java.awt.event.ActionListener() {
@@ -233,11 +242,12 @@ public class play extends javax.swing.JDialog {
         });
 
         jPanel2.setBackground(new java.awt.Color(2, 2, 23));
-        jPanel2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(2, 2, 23), 1, true));
+        jPanel2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 102, 0), 1, true));
 
-        palavra.setFont(new java.awt.Font("Tahoma", 0, 18)); // NOI18N
+        palavra.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         palavra.setForeground(new java.awt.Color(255, 255, 255));
         palavra.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        palavra.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 102, 0), 1, true));
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -277,16 +287,21 @@ public class play extends javax.swing.JDialog {
         palavras.setEditable(false);
         palavras.setBackground(new java.awt.Color(2, 2, 23));
         palavras.setColumns(5);
-        palavras.setFont(new java.awt.Font("Lucida Calligraphy", 0, 18)); // NOI18N
+        palavras.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         palavras.setForeground(new java.awt.Color(255, 255, 255));
         palavras.setLineWrap(true);
         palavras.setRows(5);
         palavras.setToolTipText("");
         palavras.setWrapStyleWord(true);
-        palavras.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(2, 2, 23), 2, true), "Palavras Formadas", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Tahoma", 0, 12), new java.awt.Color(2, 2, 23))); // NOI18N
+        palavras.setAutoscrolls(false);
+        palavras.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(255, 102, 0), 2, true), "Palavras Formadas", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.BOTTOM, new java.awt.Font("Maiandra GD", 0, 12), new java.awt.Color(255, 255, 255))); // NOI18N
         jScrollPane1.setViewportView(palavras);
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/boggle1.png"))); // NOI18N
+
+        tempo.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
+        tempo.setForeground(new java.awt.Color(255, 255, 255));
+        tempo.setText("03:00");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -295,8 +310,13 @@ public class play extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(45, 45, 45)
+                                .addComponent(tempo)))
                         .addGap(7, 7, 7)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -376,11 +396,16 @@ public class play extends javax.swing.JDialog {
                             .addComponent(b15, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(b16, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jScrollPane1))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(deletar)
-                    .addComponent(enviar))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(deletar)
+                            .addComponent(enviar)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(20, 20, 20)
+                        .addComponent(tempo)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -544,6 +569,45 @@ public class play extends javax.swing.JDialog {
             b.setText(""+l);
         }
     }
+    
+    public void tempo(){
+        timer = new Timer();
+        boolean controle = false;
+        
+        TimerTask tarefa = new TimerTask() {
+            @Override
+            public void run() {
+                int segundos = 60, minutos = 2;
+                while (true) {
+                    try {
+                        segundos--;
+
+                        if (minutos == 0 && segundos == -1) {
+                            return;
+                        }
+                        if (segundos == -1) {
+                            minutos--;
+                            segundos = 59;
+                        }
+                        if (segundos < 10) {
+                            tempo.setText("0"+minutos+":"+"0"+segundos);
+                        }else{
+                            tempo.setText("0"+minutos+":"+segundos);
+                        }
+                        Thread.sleep(100);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        };
+        timer.scheduleAtFixedRate(tarefa, 0, 1000);
+    }
+    
+    public void timer(){
+        new Tempo(this.tempo).start();
+    }
+    
     //Adiciona todos os botões na lista para que sejam setados seus caracteres.
     public void buttons(){
         butt.add(b1);
@@ -631,5 +695,6 @@ public class play extends javax.swing.JDialog {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel palavra;
     private javax.swing.JTextArea palavras;
+    private javax.swing.JLabel tempo;
     // End of variables declaration//GEN-END:variables
 }

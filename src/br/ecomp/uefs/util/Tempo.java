@@ -1,31 +1,25 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-package br.uefs.ecomp.view;
+package br.ecomp.uefs.util;
 
-import java.util.Random;
+import br.uefs.ecomp.view.View;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JLabel;
 
-/**
- *
- * @author Eduardo
- */
-public class View {
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        
+public class Tempo extends Thread{
+    private javax.swing.JLabel tempo;
+
+    public Tempo(JLabel tempo) {
+        this.tempo = tempo;
+    }
+    
+    @Override
+    public void run(){
         int segundos = 60, minutos = 2;
-        
         while (true) {
             try {
                 segundos--;
-                
+
                 if (minutos == 0 && segundos == -1) {
                     return;
                 }
@@ -33,12 +27,15 @@ public class View {
                     minutos--;
                     segundos = 59;
                 }
-                System.out.println("Tempo: 0"+minutos + ":" + segundos);
-                Thread.sleep(100);
+                if (segundos < 10) {
+                    tempo.setText("0"+minutos+":"+"0"+segundos);
+                }else{
+                    tempo.setText("0"+minutos+":"+segundos);
+                }
+                Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
-    
 }
