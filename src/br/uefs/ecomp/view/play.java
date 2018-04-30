@@ -16,9 +16,13 @@ import javax.swing.JOptionPane;
  * @author Eduardo
  */
 public class play extends javax.swing.JDialog {
-    private LinkedList<JButton> bts = new LinkedList<>();
+    //Lista encadeada de palavras que já foram formadas pelo jogador.
+    private LinkedList<String> listaPalavras = new LinkedList<>();
+    //Lista de botões que já foram selecionados pelo jogador a cada palavra formada. 
+    private LinkedList<JButton> btsSelecionados = new LinkedList<>();
+    //Lista com todos os botões que representam as letras do jogo.
     LinkedList<JButton> butt = new LinkedList<>();
-    private String text = "";
+    
     /**
      * Creates new form play
      */
@@ -401,6 +405,7 @@ public class play extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Métodos de ação para cada letra da interface.
     private void b1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b1ActionPerformed
         select(this.b1);
     }//GEN-LAST:event_b1ActionPerformed
@@ -465,39 +470,69 @@ public class play extends javax.swing.JDialog {
         select(this.b16);
     }//GEN-LAST:event_b16ActionPerformed
 
+    //Fim das funções de cada letra.
+    
+    //Meétodo de ação para resetar letras seleciondadas.
     private void deletarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletarActionPerformed
-        unSelect();
+        enableLetras();
     }//GEN-LAST:event_deletarActionPerformed
 
+    //Método para enviar a palavra formada.
     private void enviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enviarActionPerformed
+        //Verifica se nenhum botão foi marcado.
         if (palavra.getText().trim().length() < 1) {
             JOptionPane.showMessageDialog(null, "Nenhuma letra selecionada", "Erro", JOptionPane.ERROR_MESSAGE);
+        }else if(jaExiste(palavra.getText())){ //Verifica se a palavra formada já está presente na lista de mensagens formadas.
+            JOptionPane.showMessageDialog(null,"Esta palavra ja foi formada","Erro", JOptionPane.ERROR_MESSAGE);
+            enableLetras(); //Habilita todos botões referentes a letras e limpa o campo de palavra.
         }else{
-            text += palavra.getText() + "\n";
-            palavras.setText(text);
-            palavra.setText("");
-            disableLetras();
+            //Caso passe em todas as verificações, a palavra formada é inserida na lista de palavras ja formadas
+            listaPalavras.add(palavra.getText()); //Adiciona a nova palavra na lista.
+            
+            //Percorre a lista de palavras concatenando em uma string para ser exibida no TextArea da interface.
+            Iterator itr = listaPalavras.iterator();
+            String s = "";
+            while (itr.hasNext()) {
+                s += (String) itr.next() + "\n"; //Concatena as palavras na String
+            }
+            
+            palavras.setText(s); //Seta as palavras no TextArea da interface.
+            enableLetras(); //Habilita todos botões referentes a lestras e limpa o campo de palavra.
         }
     }//GEN-LAST:event_enviarActionPerformed
 
+    //Método utilizado para verificar se a palavra formada já foi formada anteriormente.
+    private boolean jaExiste(String palavra){
+        Iterator itr = listaPalavras.iterator();
+        while (itr.hasNext()) {
+            String s = (String) itr.next();
+            if (s.equals(palavra)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    //Método utilizado para desativar botão da letra que foi selecionada.
     public void select(javax.swing.JButton b){
-        b.setEnabled(false);
-        bts.add(b);
-        palavra.setText(palavra.getText()+ b.getText());
+        b.setEnabled(false); //Desativa botão selecionado.
+        btsSelecionados.add(b); //Adiciona botão na lista de botões selecionados,
+                    //para que depois de formada a palavra ele seja habilitado novamente.
+        palavra.setText(palavra.getText()+ b.getText()); //Concatena a String no JLabel para formar a palavra.
     }
-    public void unSelect(){
-        disableLetras();
-        bts.clear();
-        palavra.setText("");
-    }
-    private void disableLetras(){
-        Iterator itr = bts.iterator();
+    
+    //Método utilizado para habilitar novamente todos os botões que foram selecionados pelo jogador.
+    private void enableLetras(){
+        Iterator itr = btsSelecionados.iterator();
         while (itr.hasNext()) {
             JButton b = (JButton) itr.next();
             b.setEnabled(true);
         }
+        btsSelecionados.clear();
+        palavra.setText(""); //Seta o campo de palavra como vázio
     }
-    
+
+    //Método utilizado para gerar as letras aleatórias.
     private void gerarLetras(){
         buttons();
         Random r = new Random();
@@ -509,6 +544,7 @@ public class play extends javax.swing.JDialog {
             b.setText(""+l);
         }
     }
+    //Adiciona todos os botões na lista para que sejam setados seus caracteres.
     public void buttons(){
         butt.add(b1);
         butt.add(b2);
@@ -527,6 +563,7 @@ public class play extends javax.swing.JDialog {
         butt.add(b15);
         butt.add(b16);
     }
+    
     /**
      * @param args the command line arguments
      */
