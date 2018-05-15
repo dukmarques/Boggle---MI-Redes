@@ -33,29 +33,6 @@ public class View {
         //Adiciona os componentes da tela.
         ImageIcon img = new ImageIcon("br.uefs.ecomp.icons/boggle1.png");
         JLabel icone = new JLabel(img);
-        /*
-        JComboBox comboOrigem = new JComboBox();
-        JComboBox comboDestino = new JComboBox();
-        JButton botao = new JButton();
-        JLabel label = new JLabel();
-        JLabel labeladm = new JLabel();
-        
-        criarComboBox(c, comboOrigem, comboDestino);
-        editBotao(botao, comboOrigem, comboDestino, c);
-        text(label, "Calculo de menor caminho:");
-        
-        JPanel painel = painelUsuario(comboOrigem, comboDestino, botao, label);
-        JPanel painel2 = painelAdm(c);
-        
-        
-        //Cria um painel com aba, sendo uma para calculo de menor caminho e outra para definir o tempo de parada.
-        JTabbedPane painelP = new JTabbedPane();
-        painelP.add("Menor caminho", painel);
-        painelP.add("Tempo parada", painel2);
-        painelP.setSize(550, 500);
-        painel.setVisible(true);
-        painel.setLayout(null);
-        */
         
         JLabel text = new JLabel("Testando");
         text.setBounds(30,320 , 300, 30);
