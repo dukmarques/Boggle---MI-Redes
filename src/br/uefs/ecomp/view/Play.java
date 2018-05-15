@@ -1,8 +1,12 @@
 package br.uefs.ecomp.view;
 
 import br.ecomp.uefs.util.LetrasDados;
+import br.ecomp.uefs.util.ManipularArquivo;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -14,10 +18,15 @@ import javax.swing.JOptionPane;
  * @author Eduardo
  */
 public class Play extends javax.swing.JDialog {
+    //Hashmap do dicionário para que a verificação da palavra possa ser feito em ordem O(1).
+    private Map<String, Integer> map = new HashMap<>();
+    
     //Lista encadeada de palavras que já foram formadas pelo jogador.
     private LinkedList<String> listaPalavras = new LinkedList<>();
+    
     //Lista de botões que já foram selecionados pelo jogador a cada palavra formada. 
     private LinkedList<JButton> btsSelecionados = new LinkedList<>();
+    
     //Lista com todos os botões que representam as letras do jogo.
     LinkedList<JButton> butt = new LinkedList<>();
     
@@ -29,7 +38,14 @@ public class Play extends javax.swing.JDialog {
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
         gerarLetras();
-        timer();
+        try {
+            lerDic();
+        } catch (IOException ex) {
+            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //timer();
     }
     
     /**
@@ -520,6 +536,12 @@ public class Play extends javax.swing.JDialog {
         enableLetras();
     }//GEN-LAST:event_deletarActionPerformed
 
+    //Método para ler o dicionário.
+    private void lerDic() throws IOException, ClassNotFoundException{
+        ManipularArquivo arq = new ManipularArquivo();
+        map = arq.lerDicSerializado();
+    }
+    
     //Método para enviar a palavra formada.
     private void enviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enviarActionPerformed
         //Verifica se nenhum botão foi marcado.
@@ -528,6 +550,9 @@ public class Play extends javax.swing.JDialog {
         }else if(jaExiste(palavra.getText())){ //Verifica se a palavra formada já está presente na lista de mensagens formadas.
             JOptionPane.showMessageDialog(null,"Esta palavra ja foi formada","Erro", JOptionPane.ERROR_MESSAGE);
             enableLetras(); //Habilita todos botões referentes a letras e limpa o campo de palavra.
+        }else if(map.get(palavra.getText().toLowerCase()) == null && map.get(palavra.getText().toUpperCase()) == null ){
+            JOptionPane.showMessageDialog(null, "Esta palavra não está presente no dicionário!");
+            enableLetras();
         }else{
             //Caso passe em todas as verificações, a palavra formada é inserida na lista de palavras ja formadas
             listaPalavras.add(palavra.getText()); //Adiciona a nova palavra na lista.

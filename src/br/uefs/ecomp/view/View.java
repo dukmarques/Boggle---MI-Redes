@@ -19,7 +19,13 @@ public class View {
         ManipularArquivo arq = new ManipularArquivo();
         
         map2 = arq.lerDicSerializado();
-        System.out.println("\n"+map2.size());
+        System.out.println(map2.size());
+        
+        System.out.println(map2.get("a"));
+        
+//        for (Map.Entry<String, Integer> entry : map2.entrySet()) {
+//            System.out.println(entry.getKey()+" : " +entry.getValue());
+//        }
         
 //        hset.add("Comida");
 //        hset.add("Cuscuz");
