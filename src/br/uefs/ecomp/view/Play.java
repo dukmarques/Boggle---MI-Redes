@@ -1,11 +1,6 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.uefs.ecomp.view;
 
-import java.awt.Color;
+import br.ecomp.uefs.util.LetrasDados;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Random;
@@ -13,8 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
-import java.util.Timer;
-import javax.swing.UIManager;
 
 /**
  *
@@ -28,14 +21,13 @@ public class Play extends javax.swing.JDialog {
     //Lista com todos os botões que representam as letras do jogo.
     LinkedList<JButton> butt = new LinkedList<>();
     
-    private Timer timer;
-    
     /**
      * Creates new form play
      */
     public Play(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
         gerarLetras();
         timer();
     }
@@ -585,14 +577,15 @@ public class Play extends javax.swing.JDialog {
 
     //Método utilizado para gerar as letras aleatórias.
     private void gerarLetras(){
+        LetrasDados l = new LetrasDados();
+        String letras[] = l.letrasSort();
         buttons();
         Random r = new Random();
         
         Iterator itr = butt.iterator();
-        while (itr.hasNext()) {
-            char l = (char)(65+r.nextInt(16));
+        for (int i = 0; itr.hasNext(); i++) {
             JButton b = (JButton) itr.next();
-            b.setText(""+l);
+            b.setText(letras[i]);
         }
     }
     

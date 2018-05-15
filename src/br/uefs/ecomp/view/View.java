@@ -1,50 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package br.uefs.ecomp.view;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTabbedPane;
-import javax.swing.JTextArea;
+import br.ecomp.uefs.util.ManipularArquivo;
+import java.io.IOException;
+import java.util.AbstractMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Map;
 
-/**
- *
- * @author Eduardo
- */
+
 public class View {
-    public static void main(String[] args) {
-        JFrame tela = criarTela();
-    }
-    
-    public static JFrame criarTela(){
-        JFrame tela = new JFrame();
-        tela.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        tela.setSize(550, 500);
-        tela.setLocationRelativeTo(null);
-        tela.setTitle("Boggle");
+    public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
+//        Map<String, String> map = new HashMap<>();
+        //Map<String, String> map = new HashMap<>();
+        Map<String, Integer> map2 = new HashMap<>();
+        //HashSet<String> hset = new HashSet<>();
         
-        //Adiciona os componentes da tela.
-        ImageIcon img = new ImageIcon("br.uefs.ecomp.icons/boggle1.png");
-        JLabel icone = new JLabel(img);
+        ManipularArquivo arq = new ManipularArquivo();
         
-        JLabel text = new JLabel("Testando");
-        text.setBounds(30,320 , 300, 30);
+        map2 = arq.lerDicSerializado();
+        System.out.println("\n"+map2.size());
         
-        JPanel painel  = new JPanel();
-        painel.add(icone);
-        painel.setVisible(true);
-        painel.setSize(500, 450);
+//        hset.add("Comida");
+//        hset.add("Cuscuz");
+//        hset.add("Fitness");
+//        
+//        System.out.println(hset.contains("Fitness"));
+//        
+//        Iterator itr = hset.iterator();
+//        while (itr.hasNext()) {
+//            String s = (String) itr.next();
+//            System.out.println(s);
+//        }
         
-        tela.add(painel);
-        tela.setLayout(null);
-        tela.setVisible(true);
-        return tela;
+//        map2.put("teclado", 2);
+//        map2.put("Voce", 3);
+//        map2.put("Mouse", 4);
+//        map2.put("Miojo", 1);
+//        
+//        System.out.println(map2.get("teclado"));
+//        System.out.println(map2.get("Miojo"));
+
+//        for (String key : map.values()) {
+//            System.out.println(key);
+//        }
+//        
+//        for (HashMap.Entry<String, String> entry : map.entrySet()) {
+//            System.out.println(entry.getKey() +" "+ entry.getValue());
+//        }
     }
 }
