@@ -1,10 +1,19 @@
 package br.uefs.ecomp.view;
 
+import br.uefs.ecomp.controller.Controller;
+import br.uefs.ecomp.model.Comunicacao;
+import br.uefs.ecomp.model.Sala;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class TelaPrincipal extends javax.swing.JFrame {
-
+    private Controller c = new Controller();
+    
     public TelaPrincipal() {
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
@@ -50,6 +59,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
         });
 
         atualizar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/refresh.png"))); // NOI18N
+        atualizar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                atualizarActionPerformed(evt);
+            }
+        });
 
         jLabel4.setFont(new java.awt.Font("Maiandra GD", 0, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
@@ -60,14 +74,20 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         salas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Sala 01", "DuK - Java -  PHP - HMTL5 - JS - BootStrap - Redes"},
-                {null, null},
-                {null, null}
+
             },
             new String [] {
                 "Salas", "Jogadores"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
         jScrollPane2.setViewportView(salas);
         if (salas.getColumnModel().getColumnCount() > 0) {
             salas.getColumnModel().getColumn(0).setResizable(false);
@@ -139,11 +159,43 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void entrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_entrarActionPerformed
         DefaultTableModel dfsala = (DefaultTableModel) salas.getModel();
-        JOptionPane.showMessageDialog(null, dfsala.getValueAt(salas.getSelectedRow(), 0));
     }//GEN-LAST:event_entrarActionPerformed
 
+    private void atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atualizarActionPerformed
+        try {
+            Comunicacao comunic = new Comunicacao(true);
+            LinkedList<Sala> listaSalas = c.getSalas(comunic);
+            
+            if (listaSalas == null) {
+                JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor!", "Erro", JOptionPane.ERROR_MESSAGE);
+            }else if (listaSalas.isEmpty()) {
+                JOptionPane.showMessageDialog(null, "Não existe nenuma sala criada! Crie uma para jogar!", "Salas de Jogo", JOptionPane.INFORMATION_MESSAGE);
+            }else{
+                DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
+                
+                tabela.setRowCount(0); //Limpa dados inseridos na tabela de salas para atualizar com os novos recebidos do servidor.
+                
+                Iterator itr = listaSalas.iterator();
+                while (itr.hasNext()) {
+                    Sala s = (Sala) itr.next();
+                    String[] sl = {"Sala "+s.getNum(), getJogadores(s.getJogadores())};
+                    tabela.addRow(sl);
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+        }
+    }//GEN-LAST:event_atualizarActionPerformed
+
+    private String getJogadores(LinkedList<String> jogadores){
+        String jg = "";
+        Iterator itr = jogadores.iterator();
+        while (itr.hasNext()) {
+            String j = (String) itr.next();
+            jg = jg+" "+j;
+        }
+        return jg;
+    }
     private void formatColumn(){
-        //salas.getColumnModel().getColumn(0).setPreferredWidth(30);
         salas.getColumnModel().getColumn(1).setPreferredWidth(350);
     }
     /**
