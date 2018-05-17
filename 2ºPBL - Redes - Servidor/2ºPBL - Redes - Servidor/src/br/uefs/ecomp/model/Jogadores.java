@@ -1,13 +1,16 @@
 package br.uefs.ecomp.model;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
 public class Jogadores {
     private String nick;
     private String ip;
     private String porta;
 
-    public Jogadores(String nick, String ip, String porta) {
+    public Jogadores(String nick, String porta) throws UnknownHostException {
         this.nick = nick;
-        this.ip = ip;
+        this.ip = InetAddress.getLocalHost().getHostAddress();
         this.porta = porta;
     }
 
