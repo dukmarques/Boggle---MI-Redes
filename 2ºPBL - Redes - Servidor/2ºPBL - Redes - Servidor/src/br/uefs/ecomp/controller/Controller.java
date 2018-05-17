@@ -1,6 +1,7 @@
 package br.uefs.ecomp.controller;
 
 import br.ecomp.uefs.util.ServidorCliente;
+import br.uefs.ecomp.model.Jogadores;
 import br.uefs.ecomp.model.Sala;
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -38,8 +39,8 @@ public class Controller {
     }
     
     public Sala criarSalas(String jogador) throws UnknownHostException{
-        LinkedList<String> jogadores = new LinkedList<>();
-        jogadores.add(jogador);
+        LinkedList<Jogadores> jogadores = new LinkedList<>();
+        //jogadores.add(jogador);
         
         Sala s = new Sala(IdSala, porta, jogadores);
         IdSala++;

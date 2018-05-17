@@ -6,9 +6,9 @@ import java.util.LinkedList;
 public class Sala implements Serializable{
     private int num;
     private int porta;
-    private LinkedList<String> jogadores;
+    private LinkedList<Jogadores> jogadores;
 
-    public Sala(int num, int porta, LinkedList<String> jogadores) {
+    public Sala(int num, int porta, LinkedList<Jogadores> jogadores) {
         this.num = num;
         this.porta = porta;
         this.jogadores = jogadores;
@@ -30,11 +30,11 @@ public class Sala implements Serializable{
         this.porta = porta;
     }
 
-    public LinkedList<String> getJogadores() {
+    public LinkedList<Jogadores> getJogadores() {
         return jogadores;
     }
 
-    public void setJogadores(LinkedList<String> jogadores) {
+    public void setJogadores(LinkedList<Jogadores> jogadores) {
         this.jogadores = jogadores;
     }
 }

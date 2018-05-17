@@ -178,7 +178,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 Iterator itr = listaSalas.iterator();
                 while (itr.hasNext()) {
                     Sala s = (Sala) itr.next();
-                    String[] sl = {"Sala "+s.getNum(), getJogadores(s.getJogadores())};
+                    String[] sl = {"Sala "+s.getNum(), ""};
                     tabela.addRow(sl);
                 }
             }

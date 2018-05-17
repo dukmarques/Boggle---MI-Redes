@@ -2,6 +2,7 @@ package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.util.ManipularArquivo;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,15 +14,25 @@ public class View {
     public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
 //        Map<String, String> map = new HashMap<>();
         //Map<String, String> map = new HashMap<>();
-        Map<String, Integer> map2 = new HashMap<>();
+        //Map<String, Integer> map2 = new HashMap<>();
         //HashSet<String> hset = new HashSet<>();
         
-        ManipularArquivo arq = new ManipularArquivo();
+        //ManipularArquivo arq = new ManipularArquivo();
         
-        map2 = arq.lerDicSerializado();
-        System.out.println(map2.size());
+         try {
+            System.out.println(InetAddress.getLocalHost().getHostAddress());
+        } catch (Exception e) {
+        }
+
+
+
+
+
+
+        //map2 = arq.lerDicSerializado();
+        //System.out.println(map2.size());
         
-        System.out.println(map2.get("a"));
+        //System.out.println(map2.get("a"));
         
 //        for (Map.Entry<String, Integer> entry : map2.entrySet()) {
 //            System.out.println(entry.getKey()+" : " +entry.getValue());

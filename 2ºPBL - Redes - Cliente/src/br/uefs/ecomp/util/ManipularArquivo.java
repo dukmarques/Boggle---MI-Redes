@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 public class ManipularArquivo {
     Map<String, Integer> map = new HashMap<>();
+    Map<Integer, String> pam = new HashMap<>();
     
     public Map<String, Integer> lerDicSerializado() throws IOException, ClassNotFoundException{
         try {
@@ -30,21 +31,42 @@ public class ManipularArquivo {
         }
     }
     
+    public Map<Integer, String> lerPamSerializado() throws IOException, ClassNotFoundException{
+        try {
+            FileInputStream fis = new FileInputStream("pam.dat");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            pam = (Map<Integer, String>) ois.readObject();
+            ois.close();
+            System.out.println("HashMap para comparar palavras de outros jogadores lido com sucesso!");
+            return pam;
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(ManipularArquivo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+    
     private Map<String, Integer> lerDic() throws IOException{
         Map<String, Integer> map = new HashMap<>();
+        Map<Integer, String> pam = new HashMap<>();
+        
         BufferedReader read = null;
         int cont = 0;
         
         try {
             read = new BufferedReader(new FileReader("dictionary.dic"));
             String l;
+            
             while ((l = read.readLine()) != null) {
                 map.put(l, cont);
+                pam.put(cont, l);
                 cont++;
                 System.out.println(l);
             }
             read.close();
+            
             serializaDic(map);
+            serializaPam(pam);
+            
             return map;
             
         } catch (FileNotFoundException ex) {
@@ -60,6 +82,17 @@ public class ManipularArquivo {
             oos.writeObject(dic);
             oos.close();
         } catch (FileNotFoundException ex) {
+            Logger.getLogger(ManipularArquivo.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void serializaPam(Map<Integer, String> pam) throws IOException{
+        try {
+            FileOutputStream fos = new FileOutputStream("pam.dat");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(pam);
+            oos.close();
+        } catch (FileNotFoundException ex){
             Logger.getLogger(ManipularArquivo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

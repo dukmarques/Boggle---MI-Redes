@@ -21,6 +21,9 @@ public class Play extends javax.swing.JDialog {
     //Hashmap do dicionário para que a verificação da palavra possa ser feito em ordem O(1).
     private Map<String, Integer> map = new HashMap<>();
     
+    //Hashmap para verificar quais palavras foram feitas pelos outros jogadores.
+    private Map<Integer, String> pam = new HashMap<>();
+    
     //Lista encadeada de palavras que já foram formadas pelo jogador.
     private LinkedList<String> listaPalavras = new LinkedList<>();
     
@@ -38,6 +41,7 @@ public class Play extends javax.swing.JDialog {
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
         gerarLetras();
+    
         try {
             lerDic();
         } catch (IOException ex) {
@@ -540,6 +544,7 @@ public class Play extends javax.swing.JDialog {
     private void lerDic() throws IOException, ClassNotFoundException{
         ManipularArquivo arq = new ManipularArquivo();
         map = arq.lerDicSerializado();
+        pam = arq.lerPamSerializado();
     }
     
     //Método para enviar a palavra formada.
