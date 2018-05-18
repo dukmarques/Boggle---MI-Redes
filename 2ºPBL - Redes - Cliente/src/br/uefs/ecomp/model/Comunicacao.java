@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public class Comunicacao implements Serializable{
     private boolean requisicao;
-    private String jogador;
+    private Jogadores jogador;
 
     public Comunicacao(boolean requisicao) {
         this.requisicao = requisicao;
@@ -18,11 +18,11 @@ public class Comunicacao implements Serializable{
         this.requisicao = requisicao;
     }
 
-    public String getJogador() {
+    public Jogadores getJogador() {
         return jogador;
     }
 
-    public void setJogador(String jogador) {
+    public void setJogador(Jogadores jogador) {
         this.jogador = jogador;
     }
 }

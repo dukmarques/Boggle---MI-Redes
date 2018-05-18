@@ -12,12 +12,12 @@ import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-public class Controller {
+public class ControllerServidor {
     int IdSala = 0, porta = 2000;
     //Lista para salvar as salas abertas no jogo.
     private LinkedList<Sala> listaSalas = new LinkedList<>();
     
-    public void startServidorCliente(Controller c){
+    public void startServidorCliente(ControllerServidor c){
         try {
             ServerSocket servidor = new ServerSocket(1223);
             System.out.println("Socket para conexão de clientes aberta! Porta: 1223");
@@ -30,7 +30,7 @@ public class Controller {
                 new ServidorCliente(c, cliente).start();
             }
         } catch (IOException ex) {
-            Logger.getLogger(Controller.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ControllerServidor.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -38,14 +38,16 @@ public class Controller {
             return listaSalas;
     }
     
-    public Sala criarSalas(String jogador) throws UnknownHostException{
+    public Sala criarSalas(Jogadores jogador) throws UnknownHostException{
+        //Cria uma lista de jogadores para a sala e adiocionar o jogador que a criou nela.
         LinkedList<Jogadores> jogadores = new LinkedList<>();
-        //jogadores.add(jogador);
+        jogadores.add(jogador);
         
+        //Instancia uma sala.
         Sala s = new Sala(IdSala, porta, jogadores);
-        IdSala++;
-        porta++;
-        listaSalas.add(s);
+        IdSala++; //Incrementa o ID da Sala.
+        porta++; //Incrementa a porta para o multicast da sala.
+        listaSalas.add(s); //Adiciona a nova sala na lista de salas.
         return s;
     }
 }

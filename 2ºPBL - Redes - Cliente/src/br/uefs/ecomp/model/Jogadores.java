@@ -1,17 +1,18 @@
 package br.uefs.ecomp.model;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-public class Jogadores {
+public class Jogadores implements Serializable{
     private String nick;
     private String ip;
     private String porta;
 
-    public Jogadores(String nick, String porta) throws UnknownHostException {
+    public Jogadores(String nick) throws UnknownHostException {
         this.nick = nick;
         this.ip = InetAddress.getLocalHost().getHostAddress();
-        this.porta = porta;
+        this.porta = "1221";
     }
 
     public String getNick() {

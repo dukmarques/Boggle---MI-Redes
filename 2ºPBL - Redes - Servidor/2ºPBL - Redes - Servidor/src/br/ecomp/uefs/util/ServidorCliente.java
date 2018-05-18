@@ -1,19 +1,22 @@
 package br.ecomp.uefs.util;
 
-import br.uefs.ecomp.controller.Controller;
+import br.uefs.ecomp.controller.ControllerServidor;
 import br.uefs.ecomp.model.Comunicacao;
 import br.uefs.ecomp.model.Sala;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ServidorCliente extends Thread{
     private Socket cliente;
-    private Controller c;
+    private ControllerServidor c;
 
-    public ServidorCliente(Controller c, Socket cliente) {
+    public ServidorCliente(ControllerServidor c, Socket cliente) {
         this.c = c;
         this.cliente = cliente;
     }
@@ -40,16 +43,21 @@ public class ServidorCliente extends Thread{
             if (!com.isRequisicao()) {
                 System.out.println("Criar sala requisitado!");
                 Sala s = c.criarSalas(com.getJogador());
+                
                 ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
                 oos.flush();
                 oos.writeObject(s);
                 oos.close();
             }
             cliente.close();
-        } catch (IOException ex) {
-            System.out.println("Aconteceu algum erro na comunicação!");
         } catch (ClassNotFoundException ex) {
             System.out.println("Aconteceu algum erro na comunicação!");
+        } catch (UnknownHostException ex) {
+            System.out.println("Aconteceu algum erro na comunicação!");
+            //Logger.getLogger(ServidorCliente.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            System.out.println("Aconteceu algum erro na comunicação!");
+            //Logger.getLogger(ServidorCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

@@ -1,5 +1,6 @@
 package br.uefs.ecomp.view;
 
+import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.util.LetrasDados;
 import br.uefs.ecomp.util.ManipularArquivo;
 import java.io.IOException;
@@ -18,6 +19,7 @@ import javax.swing.JOptionPane;
  * @author Eduardo
  */
 public class Play extends javax.swing.JDialog {
+    ControllerCliente c;
     //Hashmap do dicionário para que a verificação da palavra possa ser feito em ordem O(1).
     private Map<String, Integer> map = new HashMap<>();
     
@@ -36,11 +38,12 @@ public class Play extends javax.swing.JDialog {
     /**
      * Creates new form play
      */
-    public Play(java.awt.Frame parent, boolean modal) {
+    public Play(java.awt.Frame parent, boolean modal, ControllerCliente c) {
         super(parent, modal);
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
         gerarLetras();
+        this.c = c;
     
         try {
             lerDic();
@@ -50,6 +53,11 @@ public class Play extends javax.swing.JDialog {
             Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
         }
         //timer();
+    }
+    
+    public Play(java.awt.Frame parent, boolean modal) {
+        super(parent, modal);
+        initComponents();
     }
     
     /**

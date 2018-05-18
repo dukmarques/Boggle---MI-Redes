@@ -1,6 +1,7 @@
 package br.uefs.ecomp.model;
 
 import java.io.Serializable;
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class Sala implements Serializable{
@@ -36,5 +37,18 @@ public class Sala implements Serializable{
 
     public void setJogadores(LinkedList<Jogadores> jogadores) {
         this.jogadores = jogadores;
+    }
+    
+    public String[] stringInfo(){
+        String jg = "";
+        
+        Iterator itr = jogadores.iterator();
+        while (itr.hasNext()) {
+            Jogadores j = (Jogadores) itr.next();
+            jg += j.getNick() + " ";
+        }
+        
+        String[] sl = {"Sala " + num, jg};
+        return sl;
     }
 }

@@ -1,6 +1,6 @@
 package br.uefs.ecomp.view;
 
-import br.uefs.ecomp.controller.Controller;
+import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.model.Comunicacao;
 import br.uefs.ecomp.model.Sala;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class TelaPrincipal extends javax.swing.JFrame {
-    private Controller c = new Controller();
+    private ControllerCliente c = new ControllerCliente();
     
     public TelaPrincipal() {
         initComponents();
@@ -71,6 +71,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         criar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/add-button.png"))); // NOI18N
         criar.setText("Criar Sala");
+        criar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                criarActionPerformed(evt);
+            }
+        });
 
         salas.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -178,13 +183,35 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 Iterator itr = listaSalas.iterator();
                 while (itr.hasNext()) {
                     Sala s = (Sala) itr.next();
-                    String[] sl = {"Sala "+s.getNum(), ""};
-                    tabela.addRow(sl);
+                    tabela.addRow(s.stringInfo());
                 }
             }
         } catch (ClassNotFoundException ex) {
         }
     }//GEN-LAST:event_atualizarActionPerformed
+
+    private void criarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarActionPerformed
+        if (!c.validaNick(nick)) {
+            JOptionPane.showMessageDialog(null, "Porfavor insira um apelido válido!", "Erro", JOptionPane.ERROR_MESSAGE);
+            nick.setText("");
+        }else{
+            try {
+                Sala s = c.criarSala(nick.getText());
+                
+                if (s == null) {
+                    JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor", "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
+                }else{
+                    DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
+                    tabela.addRow(s.stringInfo());
+                    
+                    Play jogar = new Play(this, true);
+                    jogar.setVisible(true);
+                }
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_criarActionPerformed
 
     private String getJogadores(LinkedList<String> jogadores){
         String jg = "";
