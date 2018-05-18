@@ -3,7 +3,6 @@ package br.uefs.ecomp.view;
 import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.model.Comunicacao;
 import br.uefs.ecomp.model.Sala;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -18,6 +17,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
         formatColumn();
+        getSalas();
     }
 
     /**
@@ -163,10 +163,25 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void entrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_entrarActionPerformed
-        DefaultTableModel dfsala = (DefaultTableModel) salas.getModel();
+        DefaultTableModel tabela =  (DefaultTableModel) salas.getModel();
+        if (!c.validaNick(nick)) {
+            JOptionPane.showMessageDialog(null, "Porfavor insira um apelido válido!","Erro", JOptionPane.ERROR_MESSAGE);
+            nick.setText("");
+        }else if(salas.getRowCount() == 0){
+            JOptionPane.showMessageDialog(null, "Nenhuma sala disponível! Crie uma!");
+        }else if(salas.getSelectedRow() == -1){
+            JOptionPane.showMessageDialog(null, "Porfavor, selecione uma sala!", "Erro", JOptionPane.ERROR_MESSAGE);
+        }else{
+            Play jogar = new Play(this, true, c);
+            jogar.setVisible(true);
+        }
     }//GEN-LAST:event_entrarActionPerformed
 
     private void atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atualizarActionPerformed
+        getSalas();
+    }//GEN-LAST:event_atualizarActionPerformed
+
+    private void getSalas(){
         try {
             Comunicacao comunic = new Comunicacao(true);
             LinkedList<Sala> listaSalas = c.getSalas(comunic);
@@ -188,8 +203,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
             }
         } catch (ClassNotFoundException ex) {
         }
-    }//GEN-LAST:event_atualizarActionPerformed
-
+    }
+    
     private void criarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarActionPerformed
         if (!c.validaNick(nick)) {
             JOptionPane.showMessageDialog(null, "Porfavor insira um apelido válido!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -204,7 +219,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
                     tabela.addRow(s.stringInfo());
                     
-                    Play jogar = new Play(this, true);
+                    Play jogar = new Play(this, true, c);
                     jogar.setVisible(true);
                 }
             } catch (ClassNotFoundException ex) {
