@@ -28,22 +28,17 @@ public class ServidorCliente extends Thread{
             
             //Caso o valor do atributo requisição da classe Comunicação for true, indica que o cliente está requisitando as salas
             //existentes no servidor!
-            if (com.isRequisicao()) {
-                if (!com.isReqEntrar()) {
-                    System.out.println("Salas requisitadas!");
-                    LinkedList<Sala> s = c.getSalas();
-                    ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
-                    oos.flush();
-                    oos.writeObject(s);
-                    oos.close();
-                }
-                if (com.isReqEntrar()) {
-                    System.out.println("Entrar na sala!");
-                }
+            if (com.getRequisicao() == 1) {
+                System.out.println("Salas requisitadas!");
+                LinkedList<Sala> s = c.getSalas();
+                ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
+                oos.flush();
+                oos.writeObject(s);
+                oos.close();
             }
             
             //Caso o valor do atributo for false, indica que o cliente está requisitando a criação de uma nova sala.
-            if (!com.isRequisicao()) {
+            if (com.getRequisicao() == 2) {
                 System.out.println("Criar sala requisitado!");
                 Sala s = c.criarSalas(com.getJogador());
                 
@@ -51,6 +46,10 @@ public class ServidorCliente extends Thread{
                 oos.flush();
                 oos.writeObject(s);
                 oos.close();
+            }
+            
+            if (com.getRequisicao() == 3) {
+                System.out.println("Requisição para entrar em uma sala!");
             }
             cliente.close();
         } catch (ClassNotFoundException ex) {

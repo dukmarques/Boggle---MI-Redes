@@ -45,6 +45,7 @@ public class ControllerServidor {
         
         //Instancia uma sala.
         Sala s = new Sala(IdSala, porta, jogadores);
+        
         IdSala++; //Incrementa o ID da Sala.
         porta++; //Incrementa a porta para o multicast da sala.
         listaSalas.add(s); //Adiciona a nova sala na lista de salas.

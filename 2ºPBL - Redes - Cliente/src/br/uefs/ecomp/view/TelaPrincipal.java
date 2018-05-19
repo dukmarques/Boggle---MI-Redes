@@ -3,8 +3,12 @@ package br.uefs.ecomp.view;
 import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.model.Comunicacao;
 import br.uefs.ecomp.model.Sala;
+import br.uefs.ecomp.util.ManipularArquivo;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -12,11 +16,22 @@ import javax.swing.table.DefaultTableModel;
 
 public class TelaPrincipal extends javax.swing.JFrame {
     private ControllerCliente c = new ControllerCliente();
+    private Map<String, Integer> map = new HashMap<>();
+    private Map<Integer, String> pam = new HashMap<>();
     
     public TelaPrincipal() {
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
         formatColumn();
+        
+        try {
+            lerDic();
+        } catch (IOException ex) {
+            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         getSalas();
     }
 
@@ -172,7 +187,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }else if(salas.getSelectedRow() == -1){
             JOptionPane.showMessageDialog(null, "Porfavor, selecione uma sala!", "Erro", JOptionPane.ERROR_MESSAGE);
         }else{
-            Play jogar = new Play(this, true, c);
+            Play jogar = new Play(this, true, c, null, map, pam, 0);
             jogar.setVisible(true);
         }
     }//GEN-LAST:event_entrarActionPerformed
@@ -183,7 +198,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
     private void getSalas(){
         try {
-            Comunicacao comunic = new Comunicacao(true);
+            Comunicacao comunic = new Comunicacao(1);
             LinkedList<Sala> listaSalas = c.getSalas(comunic);
             
             if (listaSalas == null) {
@@ -219,7 +234,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
                     tabela.addRow(s.stringInfo());
                     
-                    Play jogar = new Play(this, true, c);
+                    Play jogar = new Play(this, true, c, s, map, pam, 1);
                     jogar.setVisible(true);
                 }
             } catch (ClassNotFoundException ex) {
@@ -228,6 +243,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_criarActionPerformed
 
+    //Método para ler o dicionário.
+    private void lerDic() throws IOException, ClassNotFoundException{
+        ManipularArquivo arq = new ManipularArquivo();
+        map = arq.lerDicSerializado();
+        pam = arq.lerPamSerializado();
+    }
+    
     private String getJogadores(LinkedList<String> jogadores){
         String jg = "";
         Iterator itr = jogadores.iterator();

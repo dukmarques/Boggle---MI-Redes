@@ -1,10 +1,10 @@
 package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.ControllerCliente;
+import br.uefs.ecomp.model.Sala;
 import br.uefs.ecomp.util.LetrasDados;
 import br.uefs.ecomp.util.ManipularArquivo;
 import java.io.IOException;
-import static java.lang.Thread.sleep;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -21,11 +21,13 @@ import javax.swing.JOptionPane;
  */
 public class Play extends javax.swing.JDialog {
     ControllerCliente c;
+    private Sala s;
+    
     //Hashmap do dicionário para que a verificação da palavra possa ser feito em ordem O(1).
-    private Map<String, Integer> map = new HashMap<>();
+    private Map<String, Integer> map;
     
     //Hashmap para verificar quais palavras foram feitas pelos outros jogadores.
-    private Map<Integer, String> pam = new HashMap<>();
+    private Map<Integer, String> pam;
     
     //Lista encadeada de palavras que já foram formadas pelo jogador.
     private LinkedList<String> listaPalavras = new LinkedList<>();
@@ -39,19 +41,23 @@ public class Play extends javax.swing.JDialog {
     /**
      * Creates new form play
      */
-    public Play(java.awt.Frame parent, boolean modal, ControllerCliente c) {
+    public Play(java.awt.Frame parent, boolean modal, ControllerCliente c, Sala s, Map<String, Integer> map, Map<Integer, String> pam, int i) {
         super(parent, modal);
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
         this.c = c;
-        gerarLetras();
-        try {
-            lerDic();
-        } catch (IOException ex) {
-            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+        this.s = s;
+        this.map = map;
+        this.pam = pam;
+        
+        if (i == 1) {
+            //i = 1 significa que ele criou a sala
+        }else{
+            //Caso contrário, ele já entrou em uma sala
         }
+        
+        gerarLetras();
+        
     }
     
     public Play(java.awt.Frame parent, boolean modal) {
@@ -97,6 +103,7 @@ public class Play extends javax.swing.JDialog {
         jLabel2 = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
         jList1 = new javax.swing.JList<>();
+        info = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Boggle");
@@ -336,6 +343,10 @@ public class Play extends javax.swing.JDialog {
         });
         jScrollPane2.setViewportView(jList1);
 
+        info.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        info.setForeground(new java.awt.Color(255, 255, 255));
+        info.setText("jLabel3");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -343,7 +354,7 @@ public class Play extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(101, Short.MAX_VALUE)
+                        .addContainerGap(115, Short.MAX_VALUE)
                         .addComponent(jLabel1)
                         .addGap(52, 52, 52))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -402,6 +413,10 @@ public class Play extends javax.swing.JDialog {
                     .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane2))
                 .addGap(18, 18, 18))
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(250, 250, 250)
+                .addComponent(info)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -451,7 +466,9 @@ public class Play extends javax.swing.JDialog {
                         .addComponent(progress, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(enviar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(info)
+                .addContainerGap(24, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -547,13 +564,6 @@ public class Play extends javax.swing.JDialog {
         enableLetras();
     }//GEN-LAST:event_deletarActionPerformed
 
-    //Método para ler o dicionário.
-    private void lerDic() throws IOException, ClassNotFoundException{
-        ManipularArquivo arq = new ManipularArquivo();
-        map = arq.lerDicSerializado();
-        pam = arq.lerPamSerializado();
-    }
-    
     //Método para enviar a palavra formada.
     private void enviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enviarActionPerformed
         //Verifica se nenhum botão foi marcado.
@@ -741,6 +751,7 @@ public class Play extends javax.swing.JDialog {
     private javax.swing.JButton b9;
     private javax.swing.JButton deletar;
     private javax.swing.JButton enviar;
+    private javax.swing.JLabel info;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JList<String> jList1;

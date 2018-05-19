@@ -35,7 +35,7 @@ public class ControllerCliente {
     
     public Sala criarSala(String jogador) throws ClassNotFoundException{
         try{
-            Comunicacao c = new Comunicacao(false);
+            Comunicacao c = new Comunicacao(2);
             Jogadores jg = new Jogadores(jogador);
             c.setJogador(jg);
             Socket cliente = new Socket("127.0.0.1", 1223);
