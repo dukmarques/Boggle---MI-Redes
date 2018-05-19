@@ -4,6 +4,7 @@ import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.util.LetrasDados;
 import br.uefs.ecomp.util.ManipularArquivo;
 import java.io.IOException;
+import static java.lang.Thread.sleep;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -33,7 +34,7 @@ public class Play extends javax.swing.JDialog {
     private LinkedList<JButton> btsSelecionados = new LinkedList<>();
     
     //Lista com todos os botões que representam as letras do jogo.
-    LinkedList<JButton> butt = new LinkedList<>();
+    LinkedList<JButton> butoes = new LinkedList<>();
     
     /**
      * Creates new form play
@@ -42,9 +43,8 @@ public class Play extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
-        gerarLetras();
         this.c = c;
-    
+        gerarLetras();
         try {
             lerDic();
         } catch (IOException ex) {
@@ -52,7 +52,6 @@ public class Play extends javax.swing.JDialog {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //timer();
     }
     
     public Play(java.awt.Frame parent, boolean modal) {
@@ -612,7 +611,7 @@ public class Play extends javax.swing.JDialog {
         btsSelecionados.clear();
         palavra.setText(""); //Seta o campo de palavra como vázio
     }
-
+    
     //Método utilizado para gerar as letras aleatórias.
     private void gerarLetras(){
         LetrasDados l = new LetrasDados();
@@ -620,7 +619,7 @@ public class Play extends javax.swing.JDialog {
         buttons();
         Random r = new Random();
         
-        Iterator itr = butt.iterator();
+        Iterator itr = butoes.iterator();
         for (int i = 0; itr.hasNext(); i++) {
             JButton b = (JButton) itr.next();
             b.setText(letras[i]);
@@ -662,22 +661,22 @@ public class Play extends javax.swing.JDialog {
     
     //Adiciona todos os botões na lista para que sejam setados seus caracteres.
     public void buttons(){
-        butt.add(b1);
-        butt.add(b2);
-        butt.add(b3);
-        butt.add(b4);
-        butt.add(b5);
-        butt.add(b6);
-        butt.add(b7);
-        butt.add(b8);
-        butt.add(b9);
-        butt.add(b10);
-        butt.add(b11);
-        butt.add(b12);
-        butt.add(b13);
-        butt.add(b14);
-        butt.add(b15);
-        butt.add(b16);
+        butoes.add(b1);
+        butoes.add(b2);
+        butoes.add(b3);
+        butoes.add(b4);
+        butoes.add(b5);
+        butoes.add(b6);
+        butoes.add(b7);
+        butoes.add(b8);
+        butoes.add(b9);
+        butoes.add(b10);
+        butoes.add(b11);
+        butoes.add(b12);
+        butoes.add(b13);
+        butoes.add(b14);
+        butoes.add(b15);
+        butoes.add(b16);
     }
     
     /**

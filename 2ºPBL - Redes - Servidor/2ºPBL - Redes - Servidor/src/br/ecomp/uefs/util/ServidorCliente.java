@@ -9,8 +9,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ServidorCliente extends Thread{
     private Socket cliente;
@@ -31,12 +29,17 @@ public class ServidorCliente extends Thread{
             //Caso o valor do atributo requisição da classe Comunicação for true, indica que o cliente está requisitando as salas
             //existentes no servidor!
             if (com.isRequisicao()) {
-                System.out.println("Salas requisitadas!");
-                LinkedList<Sala> s = c.getSalas();
-                ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
-                oos.flush();
-                oos.writeObject(s);
-                oos.close();
+                if (!com.isReqEntrar()) {
+                    System.out.println("Salas requisitadas!");
+                    LinkedList<Sala> s = c.getSalas();
+                    ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
+                    oos.flush();
+                    oos.writeObject(s);
+                    oos.close();
+                }
+                if (com.isReqEntrar()) {
+                    System.out.println("Entrar na sala!");
+                }
             }
             
             //Caso o valor do atributo for false, indica que o cliente está requisitando a criação de uma nova sala.
