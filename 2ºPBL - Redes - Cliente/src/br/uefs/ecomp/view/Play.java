@@ -1,10 +1,20 @@
 package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.ControllerCliente;
+import br.uefs.ecomp.model.ComunicacaoJogo;
+import br.uefs.ecomp.model.Jogadores;
 import br.uefs.ecomp.model.Sala;
 import br.uefs.ecomp.util.LetrasDados;
 import br.uefs.ecomp.util.ManipularArquivo;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -12,6 +22,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -22,6 +33,11 @@ import javax.swing.JOptionPane;
 public class Play extends javax.swing.JDialog {
     ControllerCliente c;
     private Sala s;
+    private Jogadores adm = null;
+    private Jogadores jogadorLocal;
+    private boolean start = false;
+    String letras[];
+    int segundos, minutos;
     
     //Hashmap do dicionário para que a verificação da palavra possa ser feito em ordem O(1).
     private Map<String, Integer> map;
@@ -52,8 +68,17 @@ public class Play extends javax.swing.JDialog {
         
         if (i == 1) {
             //i = 1 significa que ele criou a sala
+            startConfigs();
+            this.jogadorLocal = s.getJogadores().getFirst();
         }else{
             //Caso contrário, ele já entrou em uma sala
+            entrouSala();
+            System.out.println("Entrou Sala!");
+            try {
+                this.jogadorLocal = new Jogadores("aleatorio");
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
         gerarLetras();
@@ -101,9 +126,11 @@ public class Play extends javax.swing.JDialog {
         tempo = new javax.swing.JLabel();
         progress = new javax.swing.JProgressBar();
         jLabel2 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jList1 = new javax.swing.JList<>();
         info = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        listaJG = new javax.swing.JTextArea();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        log = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Boggle");
@@ -334,18 +361,21 @@ public class Play extends javax.swing.JDialog {
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setText("Jogadores");
 
-        jList1.setBackground(new java.awt.Color(255, 102, 0));
-        jList1.setForeground(new java.awt.Color(255, 255, 255));
-        jList1.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = { "DuK", "PHP", "Java", "HMTL5", "Redes", "CSS", "Laravel", "UEFS" };
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
-        jScrollPane2.setViewportView(jList1);
-
         info.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         info.setForeground(new java.awt.Color(255, 255, 255));
-        info.setText("jLabel3");
+        info.setText("Log");
+
+        listaJG.setEditable(false);
+        listaJG.setBackground(new java.awt.Color(255, 102, 0));
+        listaJG.setColumns(2);
+        listaJG.setFont(new java.awt.Font("Monospaced", 0, 14)); // NOI18N
+        listaJG.setForeground(new java.awt.Color(255, 255, 255));
+        listaJG.setRows(5);
+        jScrollPane3.setViewportView(listaJG);
+
+        log.setColumns(20);
+        log.setRows(1);
+        jScrollPane2.setViewportView(log);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -354,7 +384,7 @@ public class Play extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(115, Short.MAX_VALUE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(jLabel1)
                         .addGap(52, 52, 52))
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -409,13 +439,15 @@ public class Play extends javax.swing.JDialog {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(b16, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jScrollPane2))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18))
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(250, 250, 250)
-                .addComponent(info)
+                .addContainerGap()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(info))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel1Layout.setVerticalGroup(
@@ -426,37 +458,33 @@ public class Play extends javax.swing.JDialog {
                     .addComponent(jLabel1)
                     .addComponent(jLabel2))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(b1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b2, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b3, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b4, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(b5, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b6, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b7, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b8, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(b9, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b10, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b11, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(b12, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addGap(8, 8, 8)
-                                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(b1, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b2, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b3, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b4, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(b5, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b6, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b7, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b8, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(b9, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b10, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b11, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(b12, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(b13, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(b14, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(b15, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(b16, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 240, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane3))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(deletar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -466,9 +494,11 @@ public class Play extends javax.swing.JDialog {
                         .addComponent(progress, javax.swing.GroupLayout.PREFERRED_SIZE, 12, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(enviar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(18, 18, 18)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(info)
-                .addContainerGap(24, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(60, 60, 60))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -477,15 +507,15 @@ public class Play extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 518, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 514, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
@@ -559,6 +589,136 @@ public class Play extends javax.swing.JDialog {
 
     //Fim das funções de cada letra.
     
+    public void startConfigs(){
+        try {
+            listaJG.setText(s.stringJogadores());
+            
+            MulticastSocket socket = new MulticastSocket(s.getPorta());
+            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.8");
+            socket.joinGroup(enderecoMulticast);
+            
+            ThreadMulticast(socket);
+            log.setText(log.getText()+"\nEsperando jogadores se conectarem ...");
+            log.setText(log.getText()+"\nAproveite para praticar enquanto isso!");
+            
+            timer(2, 60, 0); //Testes
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void entrouSala(){
+        try {
+            listaJG.setText(s.stringJogadores());
+            
+            MulticastSocket socket = new MulticastSocket(s.getPorta());
+            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.8");
+            socket.joinGroup(enderecoMulticast);
+            
+            ComunicacaoJogo c = new ComunicacaoJogo(1, jogadorLocal);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(c);
+            oos.close();
+            
+            byte[] dados = baos.toByteArray();
+            DatagramPacket datagrama = new DatagramPacket(dados, dados.length, enderecoMulticast, s.getPorta());
+            socket.send(datagrama);
+            
+            ThreadMulticast(socket);
+        } catch (IOException ex) {
+            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void ThreadMulticast(MulticastSocket socket){
+        new Thread(){
+            @Override
+            public void run(){
+                while (true) {
+                    try {
+                        byte[] recebe = new byte[1024];
+                        DatagramPacket datagrama = new DatagramPacket(recebe, recebe.length);
+                        socket.receive(datagrama);
+                        
+                        byte[] recebido = datagrama.getData();
+                        ByteArrayInputStream bais = new ByteArrayInputStream(recebido);
+                        ObjectInputStream ois = new ObjectInputStream(bais);
+                        ComunicacaoJogo c = (ComunicacaoJogo) ois.readObject();
+                        ois.close();
+                        
+                        //Caso a mensagem recebida seja a do mesmo jogador que a enviou é ignorada.
+                        if (c.getJogador() != jogadorLocal) {
+                            //Se a codificação da mensagem for 1, significa que um novo jogador se conectou a sala.
+                            if (c.getRequisicao() == 1) {
+                                log.setText(log.getText()+"\nJogador " + c.getJogador().getNick() + " se conectou a partida.");
+
+                                LinkedList<Jogadores> j = s.getJogadores();
+                                j.add(c.getJogador()); //Adiciona o novo jogador a lista de Salas.
+                                listaJG.setText(s.stringJogadores()); //Atualiza a informação de quantos jogadores estão na jogando.
+                                
+                                //Se a rodada já foi iniciada, é enviando pelo adm da rodada os dados da partida.
+                                if (start && adm == jogadorLocal) {//O adm da rodada responde com o tempo e dados do jogo!
+                                    enviarDadosDaPartida(socket);
+                                }
+                            }
+                            
+                            //Se a codificação for 2, significa que algum jogador deseja iniciar a partida.
+                            //Então é verificado se este jogador é o primeiro a querer jogar, caso seja ele se torna "adm" da sala.
+                            //ou seja, ele é responsável por sortear os dados e indicar o inicio da partida!
+                            if (c.getRequisicao() == 2) {
+                                if (adm != null) {
+                                    timer(2, 60, 0);
+                                }else{
+                                    adm = c.getJogador();
+                                }
+                            }
+                            
+                            //Se a codificação for 3 indica que o jogador entrou no meio da partida;
+                            if (c.getRequisicao() == 3 && !start) {
+                                start();
+                            }
+                        }
+                        
+                    } catch (IOException ex) {
+                        Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }.start();
+    }
+    
+    private void enviarDadosDaPartida(MulticastSocket socket){
+        try {
+            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.8");
+            
+            ComunicacaoJogo c = new ComunicacaoJogo(3, jogadorLocal);
+            c.setDados(letras);
+            
+            //Vetor de inteiros com os minutos, segundos e valor de progresso da barra.
+            int[] tempo = new int[3];
+            tempo[2] = progress.getValue();
+            tempo[1] = segundos;
+            tempo[0] = minutos;
+            c.setTempo(tempo);
+            
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(c);
+            oos.close();
+            
+            byte[] dados = baos.toByteArray();
+            DatagramPacket datagrama = new DatagramPacket(dados, dados.length, enderecoMulticast, s.getPorta());
+            socket.send(datagrama);
+            
+        } catch (IOException ex) {
+            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     //Meétodo de ação para resetar letras seleciondadas.
     private void deletarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletarActionPerformed
         enableLetras();
@@ -603,7 +763,7 @@ public class Play extends javax.swing.JDialog {
         return false;
     }
     
-    //Método utilizado para desativar botão da letra que foi selecionada.
+    //Método utilizado para desativar botão que foi selecionada.
     public void select(javax.swing.JButton b){
         b.setEnabled(false); //Desativa botão selecionado.
         btsSelecionados.add(b); //Adiciona botão na lista de botões selecionados,
@@ -625,7 +785,7 @@ public class Play extends javax.swing.JDialog {
     //Método utilizado para gerar as letras aleatórias.
     private void gerarLetras(){
         LetrasDados l = new LetrasDados();
-        String letras[] = l.letrasSort();
+        letras = l.letrasSort();
         buttons();
         Random r = new Random();
         
@@ -636,34 +796,34 @@ public class Play extends javax.swing.JDialog {
         }
     }
     
-    public void timer(){
+    public void timer(int min, int seg, int prog){
         new Thread(){
-            int segundos = 60, minutos = 2, progresso = 0;
+            int segundos = min, minutos = seg, progresso = prog;
             
             public void run(){
                 while (true) {
-                    try {
-                segundos--;
+                        segundos--;
 
-                if (minutos == 0 && segundos == -1) {
-                    return;
-                }
-                if (segundos == -1) {
-                    minutos--;
-                    segundos = 59;
-                }
-                if (segundos < 10) {
-                    tempo.setText("0"+minutos+":"+"0"+segundos);
-                }else{
-                    tempo.setText("0"+minutos+":"+segundos);
-                }
-                progresso++;
-                progress.setValue(progresso);
-                
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(View.class.getName()).log(Level.SEVERE, null, ex);
-            }
+                        if (minutos == 0 && segundos == -1) {
+                            return;
+                        }
+                        if (segundos == -1) {
+                            minutos--;
+                            segundos = 59;
+                        }
+                        if (segundos < 10) {
+                            tempo.setText("0"+minutos+":"+"0"+segundos);
+                        }else{
+                            tempo.setText("0"+minutos+":"+segundos);
+                        }
+                        progresso++;
+                        progress.setValue(progresso);
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }.start();
@@ -754,11 +914,13 @@ public class Play extends javax.swing.JDialog {
     private javax.swing.JLabel info;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JList<String> jList1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JTextArea listaJG;
+    private javax.swing.JTextArea log;
     private javax.swing.JLabel palavra;
     private javax.swing.JTextArea palavras;
     private javax.swing.JProgressBar progress;

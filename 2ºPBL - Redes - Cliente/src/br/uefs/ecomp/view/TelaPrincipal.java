@@ -18,6 +18,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private ControllerCliente c = new ControllerCliente();
     private Map<String, Integer> map = new HashMap<>();
     private Map<Integer, String> pam = new HashMap<>();
+    LinkedList<Sala> listaSalas;
     
     public TelaPrincipal() {
         initComponents();
@@ -109,6 +110,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
+        salas.getTableHeader().setReorderingAllowed(false);
         jScrollPane2.setViewportView(salas);
         if (salas.getColumnModel().getColumnCount() > 0) {
             salas.getColumnModel().getColumn(0).setResizable(false);
@@ -202,7 +204,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }else if(salas.getSelectedRow() == -1){
             JOptionPane.showMessageDialog(null, "Porfavor, selecione uma sala!", "Erro", JOptionPane.ERROR_MESSAGE);
         }else{
-            Play jogar = new Play(this, true, c, null, map, pam, 0);
+            Sala s = listaSalas.getFirst();
+            System.out.println(s.getNum() + s.getPorta());
+            Play jogar = new Play(this, true, c, s, map, pam, 0);
             jogar.setVisible(true);
         }
     }//GEN-LAST:event_entrarActionPerformed
@@ -210,7 +214,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private void atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atualizarActionPerformed
         try {
             Comunicacao comunic = new Comunicacao(1);
-            LinkedList<Sala> listaSalas = c.getSalas(comunic);
+            listaSalas = c.getSalas(comunic);
             
             if (listaSalas == null) {
                 JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor!", "Erro", JOptionPane.ERROR_MESSAGE);

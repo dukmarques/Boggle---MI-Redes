@@ -51,4 +51,15 @@ public class Sala implements Serializable{
         String[] sl = {"Sala " + num, jg};
         return sl;
     }
+    
+    public String stringJogadores(){
+        String lista = "";
+        
+        Iterator itr = jogadores.iterator();
+        while (itr.hasNext()) {
+            Jogadores j = (Jogadores) itr.next();
+            lista += j.getNick() + "\n";
+        }
+        return lista;
+    }
 }
