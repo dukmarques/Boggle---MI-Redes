@@ -1,20 +1,9 @@
 package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.ControllerCliente;
-import br.uefs.ecomp.model.ComunicacaoJogo;
 import br.uefs.ecomp.model.Jogadores;
 import br.uefs.ecomp.model.Sala;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.net.DatagramPacket;
-import java.net.InetAddress;
-import java.net.MulticastSocket;
 import java.net.UnknownHostException;
-import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.table.DefaultTableModel;
 
 public class SalaPlay extends javax.swing.JDialog {
     private ControllerCliente c;
@@ -77,9 +66,16 @@ public class SalaPlay extends javax.swing.JDialog {
             Class[] types = new Class [] {
                 java.lang.String.class, java.lang.String.class
             };
+            boolean[] canEdit = new boolean [] {
+                false, false
+            };
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
             }
         });
         tabela.setColumnSelectionAllowed(true);
