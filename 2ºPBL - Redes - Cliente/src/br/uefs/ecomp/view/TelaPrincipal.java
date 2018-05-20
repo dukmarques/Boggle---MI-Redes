@@ -31,7 +31,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
+        infoTP.setVisible(false);
         getSalas();
     }
 
@@ -54,6 +54,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         criar = new javax.swing.JButton();
         jScrollPane2 = new javax.swing.JScrollPane();
         salas = new javax.swing.JTable();
+        infoTP = new javax.swing.JLabel();
 
         jLabel1.setText("jLabel1");
 
@@ -114,6 +115,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
             salas.getColumnModel().getColumn(1).setResizable(false);
         }
 
+        infoTP.setForeground(new java.awt.Color(255, 255, 255));
+        infoTP.setText("Sem conexão. Tentando se conectar ao servidor... ");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -129,31 +133,42 @@ public class TelaPrincipal extends javax.swing.JFrame {
                         .addComponent(entrar)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(criar, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                         .addGap(0, 57, Short.MAX_VALUE)
-                        .addComponent(jLabel2)
-                        .addGap(18, 18, 18)
-                        .addComponent(atualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addGap(57, 57, 57))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                                .addComponent(infoTP)
+                                .addGap(18, 18, 18)
+                                .addComponent(atualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 39, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(8, 8, 8)))))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel2)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2)
-                    .addComponent(atualizar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(5, 5, 5)
+                        .addComponent(atualizar, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
+                        .addComponent(infoTP)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 215, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(entrar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(jLabel4)
                         .addComponent(nick, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addComponent(criar, javax.swing.GroupLayout.PREFERRED_SIZE, 41, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addGap(99, 99, 99))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -169,8 +184,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 427, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 454, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -193,10 +208,6 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_entrarActionPerformed
 
     private void atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atualizarActionPerformed
-        getSalas();
-    }//GEN-LAST:event_atualizarActionPerformed
-
-    private void getSalas(){
         try {
             Comunicacao comunic = new Comunicacao(1);
             LinkedList<Sala> listaSalas = c.getSalas(comunic);
@@ -218,6 +229,43 @@ public class TelaPrincipal extends javax.swing.JFrame {
             }
         } catch (ClassNotFoundException ex) {
         }
+    }//GEN-LAST:event_atualizarActionPerformed
+
+    private void getSalas(){
+        Comunicacao comunic = new Comunicacao(1);
+        
+        new Thread(){
+            LinkedList<Sala> listaSalas = null;
+            
+            public void run(){
+                do {
+                    try {
+                        listaSalas = c.getSalas(comunic);
+                        if (listaSalas == null) {
+                            infoTP.setVisible(true);
+                            //JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor!", "Erro", JOptionPane.ERROR_MESSAGE);
+                        }else if (listaSalas.isEmpty()) {
+                            JOptionPane.showMessageDialog(null, "Não existe nenuma sala criada! Crie uma para jogar!", "Salas de Jogo", JOptionPane.INFORMATION_MESSAGE);
+                            infoTP.setVisible(false);
+                        }else{
+                            infoTP.setVisible(false);
+                            DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
+                            
+                            tabela.setRowCount(0); //Limpa dados inseridos na tabela de salas para atualizar com os novos recebidos do servidor.
+                            
+                            Iterator itr = listaSalas.iterator();
+                            while (itr.hasNext()) {
+                                Sala s = (Sala) itr.next();
+                                tabela.addRow(s.stringInfo());
+                            }
+                        }
+                    } catch (ClassNotFoundException ex) {
+                        Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                } while (listaSalas == null);
+                
+            }
+        }.start();
     }
     
     private void criarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarActionPerformed
@@ -301,6 +349,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private javax.swing.JButton atualizar;
     private javax.swing.JButton criar;
     private javax.swing.JButton entrar;
+    private javax.swing.JLabel infoTP;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
