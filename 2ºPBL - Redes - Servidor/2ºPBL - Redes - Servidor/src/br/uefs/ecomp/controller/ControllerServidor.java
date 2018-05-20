@@ -8,6 +8,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -49,6 +50,30 @@ public class ControllerServidor {
         IdSala++; //Incrementa o ID da Sala.
         porta++; //Incrementa a porta para o multicast da sala.
         listaSalas.add(s); //Adiciona a nova sala na lista de salas.
+        return s;
+    }
+    
+    public Sala entrarSala(int num, Jogadores j){
+        Sala s = iteratorSalas(num);
+        
+        if (s.getJogadores().size() < 8) {
+            s.getJogadores().add(j);
+        }else{
+            s = new Sala(-1, -1, null);
+        }
+        
+        return s;
+    }
+    
+    private Sala iteratorSalas(int num){
+        Sala s = null;
+        Iterator itr = listaSalas.iterator();
+        while (itr.hasNext()) {
+            s = (Sala) itr.next();
+            if (s.getNum() == num) {
+                return s;
+            }
+        }
         return s;
     }
 }

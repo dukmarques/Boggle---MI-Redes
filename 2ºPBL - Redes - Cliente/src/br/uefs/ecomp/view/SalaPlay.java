@@ -1,18 +1,40 @@
 package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.ControllerCliente;
-import javax.swing.SwingConstants;
-import sun.swing.table.DefaultTableCellHeaderRenderer;
+import br.uefs.ecomp.model.ComunicacaoJogo;
+import br.uefs.ecomp.model.Jogadores;
+import br.uefs.ecomp.model.Sala;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
+import java.net.MulticastSocket;
+import java.net.UnknownHostException;
+import java.util.Iterator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 public class SalaPlay extends javax.swing.JDialog {
     private ControllerCliente c;
+    private Sala s;
+    private Jogadores jogadorLocal;
     
-    public SalaPlay(java.awt.Frame parent, boolean modal, ControllerCliente c) {
+    public SalaPlay(java.awt.Frame parent, boolean modal, ControllerCliente c, Sala s, String nick, int i) throws UnknownHostException {
         super(parent, modal);
         initComponents();
         this.c = c;
+        this.s = s;
+        this.jogadorLocal = new Jogadores(nick);
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
         formatColumn();
+        
+        if (i == 0) {
+            criouSala();
+        }else{
+            entrouSala();
+        }
     }
     
     public SalaPlay(java.awt.Frame parent, boolean modal) {
@@ -46,9 +68,7 @@ public class SalaPlay extends javax.swing.JDialog {
 
         tabela.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"Gel", null},
-                {"aaaaa", null},
-                {null, null}
+
             },
             new String [] {
                 "Jogador", "Status"
@@ -140,14 +160,22 @@ public class SalaPlay extends javax.swing.JDialog {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    private void criouSala(){
+        c.addJGTabela(tabela, s);
+        c.startMulticast(s, tabela, jogadorLocal);
+    }
+     
+    private void entrouSala(){
+        c.addJGTabela(tabela, s);
+        c.startMulticast(s, tabela, jogadorLocal);
+        c.avisarEntrouSala(s, jogadorLocal);
+    }
+    
     private void iniciarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_iniciarActionPerformed
         
     }//GEN-LAST:event_iniciarActionPerformed
 
     private void formatColumn(){
-//        DefaultTableCellHeaderRenderer centralizado = new DefaultTableCellHeaderRenderer();
-//        centralizado.setHorizontalAlignment(SwingConstants.CENTER);
-//        tabela.getColumnModel().getColumn(0).setCellRenderer(centralizado);
         tabela.getColumnModel().getColumn(0).setPreferredWidth(200);
     }
     /**

@@ -5,6 +5,7 @@ import br.uefs.ecomp.model.Comunicacao;
 import br.uefs.ecomp.model.Sala;
 import br.uefs.ecomp.util.ManipularArquivo;
 import java.io.IOException;
+import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -204,10 +205,25 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }else if(salas.getSelectedRow() == -1){
             JOptionPane.showMessageDialog(null, "Porfavor, selecione uma sala!", "Erro", JOptionPane.ERROR_MESSAGE);
         }else{
-            Sala s = listaSalas.getFirst();
-            System.out.println(s.getNum() + s.getPorta());
-            Play jogar = new Play(this, true, c, s, map, pam, 0);
-            jogar.setVisible(true);
+            SalaPlay sp;
+            try {
+                Sala s = c.entrarSala(nick.getText(), salas.getSelectedRow());
+                
+                if (s == null) {
+                    JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor", "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
+                    getSalas();
+                }else if(s.getNum() == -1){
+                    JOptionPane.showMessageDialog(null, "A sala já esta cheia!", "Sala cheia", JOptionPane.ERROR_MESSAGE);
+                    getSalas();
+                }else{
+                    sp = new SalaPlay(this, true, c, s,nick.getText(), 1);
+                    sp.setVisible(true);
+                }
+            } catch (UnknownHostException ex) {
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }//GEN-LAST:event_entrarActionPerformed
 
@@ -246,13 +262,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     try {
                         listaSalas = c.getSalas(comunic);
                         if (listaSalas == null) {
-                            infoTP.setVisible(true);
-                            //JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor!", "Erro", JOptionPane.ERROR_MESSAGE);
+                            disableButtons(false);
                         }else if (listaSalas.isEmpty()) {
                             JOptionPane.showMessageDialog(null, "Não existe nenuma sala criada! Crie uma para jogar!", "Salas de Jogo", JOptionPane.INFORMATION_MESSAGE);
-                            infoTP.setVisible(false);
+                            disableButtons(true);
                         }else{
-                            infoTP.setVisible(false);
+                            disableButtons(true);
                             DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
                             
                             tabela.setRowCount(0); //Limpa dados inseridos na tabela de salas para atualizar com os novos recebidos do servidor.
@@ -272,6 +287,13 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }.start();
     }
     
+    private void disableButtons(boolean b){
+        infoTP.setVisible(!b);
+        atualizar.setEnabled(b);
+        entrar.setEnabled(b);
+        criar.setEnabled(b);
+    }
+    
     private void criarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarActionPerformed
         if (!c.validaNick(nick)) {
             JOptionPane.showMessageDialog(null, "Porfavor insira um apelido válido!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -286,10 +308,19 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
                     tabela.addRow(s.stringInfo());
                     
-                    Play jogar = new Play(this, true, c, s, map, pam, 1);
-                    jogar.setVisible(true);
+                    SalaPlay sp;
+                    try {
+                        sp = new SalaPlay(this, true, c, s, nick.getText(), 0);
+                        sp.setVisible(true);
+                    } catch (UnknownHostException ex) {
+                        Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+//                    Play jogar = new Play(this, true, c, s, map, pam, 1);
+//                    jogar.setVisible(true);
                 }
             } catch (ClassNotFoundException ex) {
+                Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (UnknownHostException ex) {
                 Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
@@ -302,15 +333,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         pam = arq.lerPamSerializado();
     }
     
-    private String getJogadores(LinkedList<String> jogadores){
-        String jg = "";
-        Iterator itr = jogadores.iterator();
-        while (itr.hasNext()) {
-            String j = (String) itr.next();
-            jg = jg+" "+j;
-        }
-        return jg;
-    }
+    
     private void formatColumn(){
         salas.getColumnModel().getColumn(1).setPreferredWidth(350);
     }

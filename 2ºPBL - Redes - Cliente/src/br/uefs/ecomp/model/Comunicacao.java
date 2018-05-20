@@ -5,6 +5,7 @@ import java.io.Serializable;
 public class Comunicacao implements Serializable{
     private int requisicao;
     private Jogadores jogador;
+    private int numSala;
 
     public Comunicacao(int requisicao) {
         this.requisicao = requisicao;
@@ -24,5 +25,13 @@ public class Comunicacao implements Serializable{
 
     public void setJogador(Jogadores jogador) {
         this.jogador = jogador;
+    }
+
+    public int getNumSala() {
+        return numSala;
+    }
+
+    public void setNumSala(int numSala) {
+        this.numSala = numSala;
     }
 }

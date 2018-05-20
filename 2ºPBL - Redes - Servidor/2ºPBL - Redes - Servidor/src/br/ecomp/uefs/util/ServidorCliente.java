@@ -26,7 +26,7 @@ public class ServidorCliente extends Thread{
             ObjectInputStream r = new ObjectInputStream(cliente.getInputStream());
             Comunicacao com = (Comunicacao) r.readObject();
             
-            //Caso o valor do atributo requisição da classe Comunicação for true, indica que o cliente está requisitando as salas
+            //Caso o valor do atributo requisição da classe Comunicação for 1, indica que o cliente está requisitando as salas
             //existentes no servidor!
             if (com.getRequisicao() == 1) {
                 System.out.println("Salas requisitadas!");
@@ -37,7 +37,7 @@ public class ServidorCliente extends Thread{
                 oos.close();
             }
             
-            //Caso o valor do atributo for false, indica que o cliente está requisitando a criação de uma nova sala.
+            //Caso o valor do atributo for 2, indica que o cliente está requisitando a criação de uma nova sala.
             if (com.getRequisicao() == 2) {
                 System.out.println("Criar sala requisitado!");
                 Sala s = c.criarSalas(com.getJogador());
@@ -48,8 +48,15 @@ public class ServidorCliente extends Thread{
                 oos.close();
             }
             
+            //Caso a codificação seja 3, significa que o usuário quer entrar em uma sala.
             if (com.getRequisicao() == 3) {
                 System.out.println("Requisição para entrar em uma sala!");
+                Sala s = c.entrarSala(com.getNumSala(), com.getJogador());
+                
+                ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
+                oos.flush();
+                oos.writeObject(s);
+                oos.close();
             }
             cliente.close();
         } catch (ClassNotFoundException ex) {
