@@ -3,17 +3,28 @@ package br.uefs.ecomp.view;
 import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.model.Jogadores;
 import br.uefs.ecomp.model.Sala;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class SalaPlay extends javax.swing.JDialog {
     private ControllerCliente c;
+    private Map<String, Integer> map;
+    private Map<Integer, String> pam;
     private Sala s;
     private Jogadores jogadorLocal;
     
-    public SalaPlay(java.awt.Frame parent, boolean modal, ControllerCliente c, Sala s, String nick, int i) throws UnknownHostException {
+    public SalaPlay(java.awt.Frame parent, boolean modal, ControllerCliente c, Sala s, String nick, int i, Map<String, Integer> map, Map<Integer, String> pam) throws UnknownHostException {
         super(parent, modal);
         initComponents();
         this.c = c;
+        this.map = map;
+        this.pam = pam;
+        
         this.s = s;
         this.jogadorLocal = new Jogadores(nick);
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
@@ -24,6 +35,21 @@ public class SalaPlay extends javax.swing.JDialog {
         }else{
             entrouSala();
         }
+        
+        this.addWindowListener(new WindowAdapter() {
+        @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    c.informarSaidaServer(s, jogadorLocal);
+                    c.informarSaidaSala(s, jogadorLocal);
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(SalaPlay.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                TelaPrincipal tl = new TelaPrincipal(c, map, pam);
+                dispose();
+                tl.setVisible(true);
+            }
+        });
     }
     
     public SalaPlay(java.awt.Frame parent, boolean modal) {

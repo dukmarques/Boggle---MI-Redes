@@ -127,7 +127,13 @@ public class ControllerCliente {
             if (c.getRequisicao() == 1) {
                 //Adiciona o novo jogador na lista de salas.
                 s.getJogadores().add(c.getJogador());
-                addJGTabela(tabela, s); //
+                addJGTabela(tabela, s);
+                return;
+            }
+            //Codificação for 2, significa que um jogador saiu da sala.
+            if (c.getRequisicao() == 2) {
+                removeJogadorSala(s, j); //Remove o jogador da sala.
+                addJGTabela(tabela, s); //Atualiza a tabela.
             }
         }
     }
@@ -151,6 +157,47 @@ public class ControllerCliente {
         }
     }
     
+    //Informa ao servidor que ele se desconectou da sala.
+    //Informa aos jogadores da sala que ele se desconectou da mesma.
+    public void informarSaidaServer(Sala s, Jogadores j) throws ClassNotFoundException{
+        try {
+            Comunicacao c = new Comunicacao(4);
+            c.setJogador(j);
+            c.setNumSala(s.getNum());
+            
+            Socket cliente = new Socket("127.0.0.1", 1223);
+            
+            ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
+            oos.flush();
+            oos.writeObject(c);
+            oos.close();
+            cliente.close();
+            //requisitaServer(c); //Envia para o servidor
+        } catch (IOException ex) {
+            Logger.getLogger(ControllerCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void informarSaidaSala(Sala s, Jogadores j){
+        try {
+            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.8");
+            
+            ComunicacaoJogo c = new ComunicacaoJogo(2, j);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(baos);
+            oos.writeObject(c);
+            oos.close();
+            
+            byte[] dados = baos.toByteArray();
+            DatagramPacket datagrama = new DatagramPacket(dados, dados.length, enderecoMulticast, s.getPorta());
+            socket.send(datagrama);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(ControllerCliente.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(ControllerCliente.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
     public void addJGTabela(javax.swing.JTable tabela, Sala s){
         DefaultTableModel tbl = (DefaultTableModel) tabela.getModel();
         tbl.setRowCount(0);
@@ -168,5 +215,15 @@ public class ControllerCliente {
             return false;
         }
         return true;
+    }
+    
+    public void removeJogadorSala(Sala s, Jogadores j){
+        Iterator itr = s.getJogadores().iterator();
+        while (itr.hasNext()) {
+            Jogadores jg = (Jogadores) itr.next();
+            if (jg.getNick().equals(j.getNick())) {
+                s.getJogadores().remove(jg);
+            }
+        }
     }
 }

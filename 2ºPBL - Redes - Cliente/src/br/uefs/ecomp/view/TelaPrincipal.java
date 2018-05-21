@@ -21,6 +21,19 @@ public class TelaPrincipal extends javax.swing.JFrame {
     private Map<Integer, String> pam = new HashMap<>();
     LinkedList<Sala> listaSalas;
     
+    public TelaPrincipal(ControllerCliente c, Map<String, Integer> map, Map<Integer, String> pam) {
+        initComponents();
+        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
+        formatColumn();
+        
+        this.c = c;
+        this.map = map;
+        this.pam = pam;
+        
+        infoTP.setVisible(false);
+        getSalas();
+    }
+    
     public TelaPrincipal() {
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
@@ -36,6 +49,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
         infoTP.setVisible(false);
         getSalas();
     }
+    
+    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -216,7 +231,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "A sala já esta cheia!", "Sala cheia", JOptionPane.ERROR_MESSAGE);
                     getSalas();
                 }else{
-                    sp = new SalaPlay(this, true, c, s,nick.getText(), 1);
+                    sp = new SalaPlay(this, true, c, s,nick.getText(), 1, map, pam);
+                    dispose();
                     sp.setVisible(true);
                 }
             } catch (UnknownHostException ex) {
@@ -231,14 +247,17 @@ public class TelaPrincipal extends javax.swing.JFrame {
         try {
             Comunicacao comunic = new Comunicacao(1);
             listaSalas = c.getSalas(comunic);
+            DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
             
             if (listaSalas == null) {
                 JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor!", "Erro", JOptionPane.ERROR_MESSAGE);
+                disableButtons(false);
             }else if (listaSalas.isEmpty()) {
+                tabela.setRowCount(0);
                 JOptionPane.showMessageDialog(null, "Não existe nenuma sala criada! Crie uma para jogar!", "Salas de Jogo", JOptionPane.INFORMATION_MESSAGE);
+                disableButtons(true);
             }else{
-                DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
-                
+                disableButtons(true);
                 tabela.setRowCount(0); //Limpa dados inseridos na tabela de salas para atualizar com os novos recebidos do servidor.
                 
                 Iterator itr = listaSalas.iterator();
@@ -256,6 +275,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         
         new Thread(){
             LinkedList<Sala> listaSalas = null;
+            DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
             
             public void run(){
                 do {
@@ -266,9 +286,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
                         }else if (listaSalas.isEmpty()) {
                             JOptionPane.showMessageDialog(null, "Não existe nenuma sala criada! Crie uma para jogar!", "Salas de Jogo", JOptionPane.INFORMATION_MESSAGE);
                             disableButtons(true);
+                            tabela.setRowCount(0);
                         }else{
                             disableButtons(true);
-                            DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
                             
                             tabela.setRowCount(0); //Limpa dados inseridos na tabela de salas para atualizar com os novos recebidos do servidor.
                             
@@ -310,13 +330,12 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     
                     SalaPlay sp;
                     try {
-                        sp = new SalaPlay(this, true, c, s, nick.getText(), 0);
+                        sp = new SalaPlay(this, true, c, s, nick.getText(), 0, map, pam);
+                        dispose();
                         sp.setVisible(true);
                     } catch (UnknownHostException ex) {
                         Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
                     }
-//                    Play jogar = new Play(this, true, c, s, map, pam, 1);
-//                    jogar.setVisible(true);
                 }
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);

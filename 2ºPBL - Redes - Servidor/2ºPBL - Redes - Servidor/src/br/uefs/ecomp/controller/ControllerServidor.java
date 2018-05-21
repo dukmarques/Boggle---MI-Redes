@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.logging.Level;
@@ -65,6 +64,16 @@ public class ControllerServidor {
         return s;
     }
     
+    public void removeJogadorSala(Jogadores j, int numSala){
+        Sala s = iteratorSalas(numSala); //Recebe a sala informada.
+        removeJogador(s, j);
+        
+        if (s.getJogadores().isEmpty()) { //Verifica se a sala ficou vazia, caso sim, exclui a sala.
+            System.out.println("Sala ficou vazia e foi desfeita!");
+            listaSalas.remove(s);
+        }
+    }
+    
     private Sala iteratorSalas(int num){
         Sala s = null;
         Iterator itr = listaSalas.iterator();
@@ -75,5 +84,15 @@ public class ControllerServidor {
             }
         }
         return s;
+    }
+    
+    private void removeJogador(Sala s, Jogadores j){
+        Iterator itr = s.getJogadores().iterator();
+        while (itr.hasNext()) {
+            Jogadores jg = (Jogadores) itr.next();
+            if (jg.getNick().equals(j.getNick())) {
+                s.getJogadores().remove(jg);
+            }
+        }
     }
 }

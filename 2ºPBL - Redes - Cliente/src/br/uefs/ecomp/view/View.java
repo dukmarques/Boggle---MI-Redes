@@ -1,18 +1,21 @@
 package br.uefs.ecomp.view;
 
-import br.uefs.ecomp.util.ManipularArquivo;
-import java.io.IOException;
-import java.net.InetAddress;
-import java.util.AbstractMap;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
-
+import java.util.LinkedList;
 
 public class View {
-    public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException {
-        TelaPrincipal tela = new TelaPrincipal();
-        tela.setVisible(true);
-    }
+    public static void main(String[] args) throws InterruptedException{
+        LinkedList<String> s = new LinkedList<>();
+        
+        s.add("a");
+        s.add("b");
+        
+        s.remove("a");
+        
+        Iterator itr = s.iterator();
+        while (itr.hasNext()) {
+            String c = (String) itr.next();
+            System.out.println(c);
+        }
+    }        
 }

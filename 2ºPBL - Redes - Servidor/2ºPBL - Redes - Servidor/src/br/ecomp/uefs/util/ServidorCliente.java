@@ -58,6 +58,12 @@ public class ServidorCliente extends Thread{
                 oos.writeObject(s);
                 oos.close();
             }
+            
+            //Caso a codificação for 4, signifia que um jogador se desconectou da sala.
+            if (com.getRequisicao() == 4) {
+                System.out.println("Requisição para remorção o jogador "+ com.getJogador().getNick() +" da sala "+com.getNumSala());
+                c.removeJogadorSala(com.getJogador(), com.getNumSala());
+            }
             cliente.close();
         } catch (ClassNotFoundException ex) {
             System.out.println("Aconteceu algum erro na comunicação!");
