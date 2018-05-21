@@ -5,24 +5,20 @@ import br.uefs.ecomp.model.ComunicacaoJogo;
 import br.uefs.ecomp.model.Jogadores;
 import br.uefs.ecomp.model.Sala;
 import br.uefs.ecomp.util.LetrasDados;
-import br.uefs.ecomp.util.ManipularArquivo;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.UnknownHostException;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
@@ -33,8 +29,11 @@ import javax.swing.JOptionPane;
 public class Play extends javax.swing.JDialog {
     ControllerCliente c;
     private Sala s;
-    private Jogadores adm = null;
     private Jogadores jogadorLocal;
+    
+    private MulticastSocket socket;
+    
+    private Jogadores adm = null;
     private boolean start = false;
     String letras[];
     int segundos, minutos;
@@ -57,7 +56,7 @@ public class Play extends javax.swing.JDialog {
     /**
      * Creates new form play
      */
-    public Play(java.awt.Frame parent, boolean modal, ControllerCliente c, Sala s, Map<String, Integer> map, Map<Integer, String> pam, int i) {
+    public Play(java.awt.Frame parent, boolean modal, ControllerCliente c, Sala s, Map<String, Integer> map, Map<Integer, String> pam, Jogadores j, int i) {
         super(parent, modal);
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
@@ -66,20 +65,34 @@ public class Play extends javax.swing.JDialog {
         this.map = map;
         this.pam = pam;
         
+        this.jogadorLocal = j;
+        startMulticast(); //Inicia o multicast do jogo!
+        
         if (i == 1) {
-            //i = 1 significa que ele criou a sala
+            this.adm = jogadorLocal;
+            //i = 1 significa que foi o primeiro a entrar na sala!
             startConfigs();
-            this.jogadorLocal = s.getJogadores().getFirst();
         }else{
             //Caso contrário, ele já entrou em uma sala
+            this.adm = s.getJogadores().getFirst();
             entrouSala();
-            System.out.println("Entrou Sala!");
-            try {
-                this.jogadorLocal = new Jogadores("aleatorio");
-            } catch (UnknownHostException ex) {
-                Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
-            }
         }
+        //Evento para quando o jogador fechar a janela de jogo
+        this.addWindowListener(new WindowAdapter() {
+        @Override
+            public void windowClosing(WindowEvent e) {
+                try {
+                    saiuSala();
+                    c.informarSaidaServer(s, jogadorLocal); //Informa ao servidor que se desconectou da sala.
+                    
+//                    TelaPrincipal tela = new TelaPrincipal(c, map, pam); //Chama a tela principal novamente.
+//                    dispose(); //Desfaz a tela atual.
+//                    tela.setVisible(true); //torna visível a tela principa.
+                } catch (ClassNotFoundException ex) {
+                    Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        });
         
         gerarLetras();
         
@@ -129,8 +142,8 @@ public class Play extends javax.swing.JDialog {
         info = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         listaJG = new javax.swing.JTextArea();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        log = new javax.swing.JTextArea();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        log = new javax.swing.JTextPane();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Boggle");
@@ -373,9 +386,9 @@ public class Play extends javax.swing.JDialog {
         listaJG.setRows(5);
         jScrollPane3.setViewportView(listaJG);
 
-        log.setColumns(20);
-        log.setRows(1);
-        jScrollPane2.setViewportView(log);
+        log.setEditable(false);
+        log.setCaretPosition(log.getText().length());
+        jScrollPane4.setViewportView(log);
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -446,7 +459,7 @@ public class Play extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 482, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 501, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(info))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -496,9 +509,9 @@ public class Play extends javax.swing.JDialog {
                     .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(info)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 36, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(60, 60, 60))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.DEFAULT_SIZE, 53, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -514,8 +527,8 @@ public class Play extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 514, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pack();
@@ -586,104 +599,147 @@ public class Play extends javax.swing.JDialog {
     private void b16ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_b16ActionPerformed
         select(this.b16);
     }//GEN-LAST:event_b16ActionPerformed
-
     //Fim das funções de cada letra.
     
     public void startConfigs(){
-        try {
-            listaJG.setText(s.stringJogadores());
-            
-            MulticastSocket socket = new MulticastSocket(s.getPorta());
-            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.8");
-            socket.joinGroup(enderecoMulticast);
-            
-            ThreadMulticast(socket);
-            log.setText(log.getText()+"\nEsperando jogadores se conectarem ...");
-            log.setText(log.getText()+"\nAproveite para praticar enquanto isso!");
-            
-            timer(2, 60, 0); //Testes
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        listaJG.setText(s.stringJogadores());
+        
+        //log.requestFocus();
+        //log.setCaretPosition(log.getText().length());
+        log.setText("Esperando jogadores se conectarem ...");
+        log.setText(log.getText()+"\nAproveite para praticar enquanto isso!");
     }
     
     public void entrouSala(){
+        listaJG.setText(s.stringJogadores());
+        
+        log.requestFocus();
+        log.setCaretPosition(log.getText().length());
+        log.setText("Jogo iniciado...");
+        
+        c.informarEntradaJogo(socket, s, jogadorLocal);
+    }
+    
+    //Envia para o multicast da sala um aviso que saiu do jogo antes de sair.
+    public void saiuSala(){
+        c.informarSaidaJogo(socket, s, jogadorLocal);
+    }
+    
+    //Método que inicia o multicast do jogo!
+    public void startMulticast(){
         try {
-            listaJG.setText(s.stringJogadores());
-            
-            MulticastSocket socket = new MulticastSocket(s.getPorta());
-            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.8");
+            socket = new MulticastSocket(s.getPorta());
+            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.9");
             socket.joinGroup(enderecoMulticast);
             
-            ComunicacaoJogo c = new ComunicacaoJogo(1, jogadorLocal);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(c);
-            oos.close();
+            byte[] recebe = new byte[1024];
+            DatagramPacket datagrama = new DatagramPacket(recebe, recebe.length);
             
-            byte[] dados = baos.toByteArray();
-            DatagramPacket datagrama = new DatagramPacket(dados, dados.length, enderecoMulticast, s.getPorta());
-            socket.send(datagrama);
-            
-            ThreadMulticast(socket);
+            new Thread(){
+                @Override
+                public void run(){
+                    while (true) {
+                        try {
+                            socket.receive(datagrama);
+                            
+                            byte[] recebido = datagrama.getData();
+                            ByteArrayInputStream bais = new ByteArrayInputStream(recebido);
+                            ObjectInputStream ois = new ObjectInputStream(bais);
+                            ComunicacaoJogo com = (ComunicacaoJogo) ois.readObject();
+                            
+                            requisicoes(com);
+                        } catch (IOException ex) {
+                            Logger.getLogger(ControllerCliente.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(ControllerCliente.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                    }
+                }
+            }.start();
         } catch (IOException ex) {
-            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(ControllerCliente.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
-    public void ThreadMulticast(MulticastSocket socket){
+    //Método que trata as requisições feita na tela de jogo!
+    public void requisicoes(ComunicacaoJogo com){
+        //Caso a requisição recebida seja a do mesmo jogador que a enviou ela é ignorada.
+        System.out.println("Jogador: " + com.getJogador().getNick() + " r: " + com.getRequisicao());
+        
+        if (!com.getJogador().getNick().equals(jogadorLocal.getNick())) {
+            //System.out.println("Requisição " + com.getRequisicao() + " do jogador: " + com.getJogador().getNick());
+            
+            //Codificação for 1 significa que um novo jogador iniciou a partida.
+            if (com.getRequisicao() == 1) {
+                log.setText(log.getText()+"\n"+com.getJogador().getNick() + " entrou na partida!");
+                s.getJogadores().add(com.getJogador());
+                listaJG.setText(s.stringJogadores());
+                
+                //Se a rodada já foi iniciada e o cliente for o adm da rodada, ele envia os dados da partida!
+                if (!start && adm.getNick().equals(jogadorLocal.getNick())) {
+                    c.enviarDadosDaPartida(socket, s, jogadorLocal, letras, 2, 60, progress.getValue());
+                }else{
+                    //Inicia a partida!
+                    iniciarJogo(2, 60, 0);
+                }
+            }
+            //Se a codificação for 2, significa que algum jogador se desconectou da partida!
+            if (com.getRequisicao() == 2) {
+                
+                log.setText(log.getText() + "\n" + com.getJogador().getNick() + " saiu da partida!");
+                c.removeJogadorSala(s, com.getJogador());
+                
+                if (adm.getNick().equals(com.getJogador().getNick())) {
+                    adm = s.getJogadores().getFirst();
+                    System.out.println("Novo Adm da sala: " + adm.getNick());
+                }
+                listaJG.setText(s.stringJogadores());
+                
+            }
+            
+            //Se a codificação for 3 e o jogo não estiver iniciado, significa que é a resposta do ADM pra alguém que acabou de entrar.
+            if (com.getRequisicao() == 3 && !start) {
+                int[] tempo = com.getTempo();
+                log.setText(log.getText()+"\nPartida iniciada");
+                
+                iniciarJogo(tempo[0], tempo[1], tempo[2]);
+                gerarLetras(com.getDados());
+            }
+            
+            //Se a codificação for 4 o ADM está enviando os dados da partida!
+            if (com.getRequisicao() == 4) {
+                
+            }
+        }
+    }
+    
+    public void iniciarJogo(int min, int seg, int prog){
         new Thread(){
+            int segundos = seg, minutos = min, progresso = prog;
+            
             @Override
             public void run(){
                 while (true) {
-                    try {
-                        byte[] recebe = new byte[1024];
-                        DatagramPacket datagrama = new DatagramPacket(recebe, recebe.length);
-                        socket.receive(datagrama);
-                        
-                        byte[] recebido = datagrama.getData();
-                        ByteArrayInputStream bais = new ByteArrayInputStream(recebido);
-                        ObjectInputStream ois = new ObjectInputStream(bais);
-                        ComunicacaoJogo c = (ComunicacaoJogo) ois.readObject();
-                        ois.close();
-                        
-                        //Caso a mensagem recebida seja a do mesmo jogador que a enviou é ignorada.
-                        if (c.getJogador() != jogadorLocal) {
-                            //Se a codificação da mensagem for 1, significa que um novo jogador se conectou a sala.
-                            if (c.getRequisicao() == 1) {
-                                log.setText(log.getText()+"\nJogador " + c.getJogador().getNick() + " se conectou a partida.");
+                        segundos--;
 
-                                LinkedList<Jogadores> j = s.getJogadores();
-                                j.add(c.getJogador()); //Adiciona o novo jogador a lista de Salas.
-                                listaJG.setText(s.stringJogadores()); //Atualiza a informação de quantos jogadores estão na jogando.
-                                
-                                //Se a rodada já foi iniciada, é enviando pelo adm da rodada os dados da partida.
-                                if (start && adm == jogadorLocal) {//O adm da rodada responde com o tempo e dados do jogo!
-                                    enviarDadosDaPartida(socket);
-                                }
-                            }
-                            
-                            //Se a codificação for 2, significa que algum jogador deseja iniciar a partida.
-                            //Então é verificado se este jogador é o primeiro a querer jogar, caso seja ele se torna "adm" da sala.
-                            //ou seja, ele é responsável por sortear os dados e indicar o inicio da partida!
-                            if (c.getRequisicao() == 2) {
-                                if (adm != null) {
-                                    timer(2, 60, 0);
-                                }else{
-                                    adm = c.getJogador();
-                                }
-                            }
-                            
-                            //Se a codificação for 3 indica que o jogador entrou no meio da partida;
-                            if (c.getRequisicao() == 3 && !start) {
-                                start();
-                            }
+                        if (minutos == 0 && segundos == -1) {
+                            return;
                         }
-                        
-                    } catch (IOException ex) {
-                        Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (ClassNotFoundException ex) {
+                        if (segundos == -1) {
+                            minutos--;
+                            segundos = 59;
+                        }
+                        if (segundos < 10) {
+                            tempo.setText("0"+minutos+":"+"0"+segundos);
+                        }else{
+                            tempo.setText("0"+minutos+":"+segundos);
+                        }
+                        progresso++;
+                        progress.setValue(progresso);
+
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
                         Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
@@ -691,35 +747,18 @@ public class Play extends javax.swing.JDialog {
         }.start();
     }
     
-    private void enviarDadosDaPartida(MulticastSocket socket){
-        try {
-            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.8");
-            
-            ComunicacaoJogo c = new ComunicacaoJogo(3, jogadorLocal);
-            c.setDados(letras);
-            
-            //Vetor de inteiros com os minutos, segundos e valor de progresso da barra.
-            int[] tempo = new int[3];
-            tempo[2] = progress.getValue();
-            tempo[1] = segundos;
-            tempo[0] = minutos;
-            c.setTempo(tempo);
-            
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(c);
-            oos.close();
-            
-            byte[] dados = baos.toByteArray();
-            DatagramPacket datagrama = new DatagramPacket(dados, dados.length, enderecoMulticast, s.getPorta());
-            socket.send(datagrama);
-            
-        } catch (IOException ex) {
-            Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
+    private void gerarLetras(String[] l){
+        letras = l;
+        
+        Iterator itr = butoes.iterator();
+        for (int i = 0; itr.hasNext(); i++) {
+            JButton b = (JButton) itr.next();
+            b.setText(letras[i]);
         }
     }
     
-    //Meétodo de ação para resetar letras seleciondadas.
+    //---------- métodos da interface do jogo --------------    
+    //Método de ação para resetar letras seleciondadas.
     private void deletarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_deletarActionPerformed
         enableLetras();
     }//GEN-LAST:event_deletarActionPerformed
@@ -794,39 +833,6 @@ public class Play extends javax.swing.JDialog {
             JButton b = (JButton) itr.next();
             b.setText(letras[i]);
         }
-    }
-    
-    public void timer(int min, int seg, int prog){
-        new Thread(){
-            int segundos = min, minutos = seg, progresso = prog;
-            
-            public void run(){
-                while (true) {
-                        segundos--;
-
-                        if (minutos == 0 && segundos == -1) {
-                            return;
-                        }
-                        if (segundos == -1) {
-                            minutos--;
-                            segundos = 59;
-                        }
-                        if (segundos < 10) {
-                            tempo.setText("0"+minutos+":"+"0"+segundos);
-                        }else{
-                            tempo.setText("0"+minutos+":"+segundos);
-                        }
-                        progresso++;
-                        progress.setValue(progresso);
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-        }.start();
     }
     
     //Adiciona todos os botões na lista para que sejam setados seus caracteres.
@@ -917,10 +923,10 @@ public class Play extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JTextArea listaJG;
-    private javax.swing.JTextArea log;
+    private javax.swing.JTextPane log;
     private javax.swing.JLabel palavra;
     private javax.swing.JTextArea palavras;
     private javax.swing.JProgressBar progress;

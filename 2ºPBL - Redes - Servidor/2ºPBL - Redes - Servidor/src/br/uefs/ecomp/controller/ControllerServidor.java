@@ -54,9 +54,10 @@ public class ControllerServidor {
     
     public Sala entrarSala(int num, Jogadores j){
         Sala s = iteratorSalas(num);
+        LinkedList<Jogadores> jogadores = s.getJogadores();
         
-        if (s.getJogadores().size() < 8) {
-            s.getJogadores().add(j);
+        if (jogadores.size() < 8) {
+            jogadores.add(j);
         }else{
             s = new Sala(-1, -1, null);
         }

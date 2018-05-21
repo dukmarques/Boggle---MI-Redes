@@ -2,6 +2,7 @@ package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.model.Comunicacao;
+import br.uefs.ecomp.model.Jogadores;
 import br.uefs.ecomp.model.Sala;
 import br.uefs.ecomp.util.ManipularArquivo;
 import java.io.IOException;
@@ -220,9 +221,9 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }else if(salas.getSelectedRow() == -1){
             JOptionPane.showMessageDialog(null, "Porfavor, selecione uma sala!", "Erro", JOptionPane.ERROR_MESSAGE);
         }else{
-            SalaPlay sp;
             try {
-                Sala s = c.entrarSala(nick.getText(), salas.getSelectedRow());
+                Jogadores jogador = new Jogadores(nick.getText());
+                Sala s = c.entrarSala(jogador, salas.getSelectedRow());
                 
                 if (s == null) {
                     JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor", "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
@@ -231,9 +232,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "A sala já esta cheia!", "Sala cheia", JOptionPane.ERROR_MESSAGE);
                     getSalas();
                 }else{
-                    sp = new SalaPlay(this, true, c, s,nick.getText(), 1, map, pam);
-                    dispose();
-                    sp.setVisible(true);
+                    Play p = new Play(this, true, c, s, map, pam, jogador, 0);
+                    //dispose();
+                    p.setVisible(true);
+                    getSalas();
                 }
             } catch (UnknownHostException ex) {
                 Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
@@ -320,7 +322,8 @@ public class TelaPrincipal extends javax.swing.JFrame {
             nick.setText("");
         }else{
             try {
-                Sala s = c.criarSala(nick.getText());
+                Jogadores jogador = new Jogadores(nick.getText());
+                Sala s = c.criarSala(jogador);
                 
                 if (s == null) {
                     JOptionPane.showMessageDialog(null, "Não foi possível se conectar com o servidor", "Erro de Conexão", JOptionPane.ERROR_MESSAGE);
@@ -328,14 +331,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
                     DefaultTableModel tabela = (DefaultTableModel) salas.getModel();
                     tabela.addRow(s.stringInfo());
                     
-                    SalaPlay sp;
-                    try {
-                        sp = new SalaPlay(this, true, c, s, nick.getText(), 0, map, pam);
-                        dispose();
-                        sp.setVisible(true);
-                    } catch (UnknownHostException ex) {
-                        Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    Play p = new Play(this, true, c, s, map, pam, jogador, 1);
+                    //dispose();
+                    p.setVisible(true);
+                    getSalas();
                 }
             } catch (ClassNotFoundException ex) {
                 Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
