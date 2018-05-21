@@ -148,6 +148,12 @@ public class ControllerCliente {
         
         comunicarSala(socket, s, c, "236.52.65.9");
     }
+    
+    public void iniciarPartida(MulticastSocket socket, Sala s, Jogadores j, String[] letras){
+        ComunicacaoJogo c = new ComunicacaoJogo(4, j);
+        c.setDados(letras);
+        comunicarSala(socket, s, c, "236.52.65.9");
+    }
 
     //Métodos para comunicacao multicast sala
 //    public void startMulticast(Sala s, javax.swing.JTable tabela, Jogadores j){

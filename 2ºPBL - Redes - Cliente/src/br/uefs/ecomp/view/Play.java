@@ -36,7 +36,7 @@ public class Play extends javax.swing.JDialog {
     private Jogadores adm = null;
     private boolean start = false;
     String letras[];
-    int segundos, minutos;
+    public int segundos, minutos;
     
     //Hashmap do dicionário para que a verificação da palavra possa ser feito em ordem O(1).
     private Map<String, Integer> map;
@@ -676,12 +676,19 @@ public class Play extends javax.swing.JDialog {
                 listaJG.setText(s.stringJogadores());
                 
                 //Se a rodada já foi iniciada e o cliente for o adm da rodada, ele envia os dados da partida!
-                if (!start && adm.getNick().equals(jogadorLocal.getNick())) {
-                    c.enviarDadosDaPartida(socket, s, jogadorLocal, letras, 2, 60, progress.getValue());
+                if (start && adm.getNick().equals(jogadorLocal.getNick())) {
+                    c.enviarDadosDaPartida(socket, s, jogadorLocal, letras, minutos, segundos, progress.getValue());
                 }else{
                     //Inicia a partida!
+                    LetrasDados l = new LetrasDados();
+                    letras = l.letrasSort();
+                    
+                    c.iniciarPartida(socket, s, jogadorLocal, letras);
+                    
+                    gerarLetras(letras);
                     iniciarJogo(2, 60, 0);
                 }
+                return;
             }
             //Se a codificação for 2, significa que algum jogador se desconectou da partida!
             if (com.getRequisicao() == 2) {
@@ -694,7 +701,7 @@ public class Play extends javax.swing.JDialog {
                     System.out.println("Novo Adm da sala: " + adm.getNick());
                 }
                 listaJG.setText(s.stringJogadores());
-                
+                return;
             }
             
             //Se a codificação for 3 e o jogo não estiver iniciado, significa que é a resposta do ADM pra alguém que acabou de entrar.
@@ -704,16 +711,22 @@ public class Play extends javax.swing.JDialog {
                 
                 iniciarJogo(tempo[0], tempo[1], tempo[2]);
                 gerarLetras(com.getDados());
+                return;
             }
             
-            //Se a codificação for 4 o ADM está enviando os dados da partida!
+            //Se a codificação for 4 o ADM está dando inicio a partida!
             if (com.getRequisicao() == 4) {
+                gerarLetras(com.getDados());
+                iniciarJogo(2, 60, 0);
                 
+                return;
             }
         }
     }
     
     public void iniciarJogo(int min, int seg, int prog){
+        log.setText(log.getText() + "\nPartida iniciada.");
+        this.start = true;
         new Thread(){
             int segundos = seg, minutos = min, progresso = prog;
             
