@@ -678,7 +678,7 @@ public class Play extends javax.swing.JDialog {
                 //Se a rodada já foi iniciada e o cliente for o adm da rodada, ele envia os dados da partida!
                 if (start && adm.getNick().equals(jogadorLocal.getNick())) {
                     c.enviarDadosDaPartida(socket, s, jogadorLocal, letras, minutos, segundos, progress.getValue());
-                }else{
+                }else if(!start && s.getJogadores().size() == 2){
                     //Inicia a partida!
                     LetrasDados l = new LetrasDados();
                     letras = l.letrasSort();
@@ -727,12 +727,15 @@ public class Play extends javax.swing.JDialog {
     public void iniciarJogo(int min, int seg, int prog){
         log.setText(log.getText() + "\nPartida iniciada.");
         this.start = true;
+        
+        this.segundos = seg; this.minutos = min;
         new Thread(){
-            int segundos = seg, minutos = min, progresso = prog;
+        int progresso = prog;
+            //int segundos = seg, minutos = min, progresso = prog;
             
             @Override
             public void run(){
-                while (true) {
+                while (s.getJogadores().size() > 1) {
                         segundos--;
 
                         if (minutos == 0 && segundos == -1) {
