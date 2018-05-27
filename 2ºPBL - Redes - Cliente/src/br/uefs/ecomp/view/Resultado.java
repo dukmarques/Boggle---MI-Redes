@@ -1,21 +1,33 @@
 package br.uefs.ecomp.view;
 
+import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.model.Jogadores;
 import br.uefs.ecomp.model.Sala;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
 
 public class Resultado extends javax.swing.JDialog {
+    private ControllerCliente c;
     private Sala s;
     private LinkedList<Jogadores> resultado = new LinkedList<>();
+    Map<Integer, String> pam;
+    boolean calculando;
     
     /**
      * Creates new form Resultado
      */
 
-    public Resultado(java.awt.Frame parent, boolean modal, Sala s) {
+    public Resultado(java.awt.Frame parent, boolean modal, ControllerCliente c, Map<Integer, String> pam, Sala s) {
         super(parent, modal);
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
+        this.c = c;
+        this.pam = pam;
         this.s = s;
     }
     
@@ -23,9 +35,54 @@ public class Resultado extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
+        configs();
+    }
+    
+    private void configs(){
+        calculando = true;
+        new Thread(){
+            @Override
+            public void run(){
+                for (int i = 0; calculando; i++) {
+                    try {
+                        if (i == 0) {
+                            info.setText("Calculando pontuações .");
+                        }else if(i == 1){
+                            info.setText("Calculando pontuações ..");
+                        }else{
+                            info.setText("Calculando pontuações ...");
+                            i = -1;
+                        }
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Resultado.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            }
+        }.start();
+        
+        c.anularPalavrasIguais(s);
+        decodificarPalavras();
+        calculando = false;
+        listaVencedor();
     }
     
     
+    //Método utilizado para decodificar todas as letras formadas pelos jogadores!
+    private void decodificarPalavras(){
+        Iterator itr = s.getJogadores().iterator();
+        while (itr.hasNext()) {
+            Jogadores j = (Jogadores) itr.next();
+            j.setPalavras(c.decodificarLetras(pam, j.getCodPalavras()));
+        }
+        //Após decodificar as palavras é feito o calculo de pontos com as palavras formadas!
+        c.calcularPontos(s);
+    }
+    
+    private void listaVencedor(){
+        DefaultTableModel tabela = (DefaultTableModel) vencedores.getModel();
+        
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -39,9 +96,9 @@ public class Resultado extends javax.swing.JDialog {
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        vencedores = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        jLabel3 = new javax.swing.JLabel();
+        info = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Boggle");
@@ -51,7 +108,7 @@ public class Resultado extends javax.swing.JDialog {
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/boggle1.png"))); // NOI18N
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        vencedores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null},
                 {null, null, null},
@@ -81,13 +138,13 @@ public class Resultado extends javax.swing.JDialog {
                 return canEdit [columnIndex];
             }
         });
-        jTable1.getTableHeader().setReorderingAllowed(false);
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(0).setResizable(false);
-            jTable1.getColumnModel().getColumn(0).setPreferredWidth(50);
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(2).setResizable(false);
+        vencedores.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(vencedores);
+        if (vencedores.getColumnModel().getColumnCount() > 0) {
+            vencedores.getColumnModel().getColumn(0).setResizable(false);
+            vencedores.getColumnModel().getColumn(0).setPreferredWidth(50);
+            vencedores.getColumnModel().getColumn(1).setResizable(false);
+            vencedores.getColumnModel().getColumn(2).setResizable(false);
         }
 
         jLabel2.setFont(new java.awt.Font("Maiandra GD", 1, 18)); // NOI18N
@@ -95,9 +152,8 @@ public class Resultado extends javax.swing.JDialog {
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/win.png"))); // NOI18N
         jLabel2.setText("Jogador");
 
-        jLabel3.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
-        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel3.setText("Calculando pontuações ...");
+        info.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
+        info.setForeground(new java.awt.Color(255, 255, 255));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -119,7 +175,7 @@ public class Resultado extends javax.swing.JDialog {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(47, 47, 47))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jLabel3)
+                        .addComponent(info)
                         .addGap(90, 90, 90))))
         );
         jPanel1Layout.setVerticalGroup(
@@ -132,8 +188,8 @@ public class Resultado extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jLabel3)
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addComponent(info)
+                .addContainerGap(33, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
@@ -200,11 +256,11 @@ public class Resultado extends javax.swing.JDialog {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel info;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable vencedores;
     // End of variables declaration//GEN-END:variables
 }

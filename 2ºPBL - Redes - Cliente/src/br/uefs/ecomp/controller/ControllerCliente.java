@@ -197,6 +197,62 @@ public class ControllerCliente {
         }
     }
     
+    public void anularPalavrasIguais(Sala s){
+        LinkedList<Integer> iguais = new LinkedList<>();
+        Iterator itr = s.getJogadores().iterator();
+        
+        while (itr.hasNext()) {
+            Jogadores j = (Jogadores) itr.next();
+            int[] p1 = j.getCodPalavras();
+            
+            Iterator itr2 = s.getJogadores().iterator();
+            
+            while (itr2.hasNext()) {
+                Jogadores jg = (Jogadores) itr2.next();
+                int[] p2 = jg.getCodPalavras();
+
+                if (!jg.getNick().equals(j.getNick())) {
+                    for (int i = 0; i < p1.length; i++) {
+                        for (int k = 0; k < p2.length; k++) {
+                            if (p1[i] == p2[k]) {
+                                iguais.add(p1[i]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        
+        //Remove todas codificações de letras que foram feitas igualmente por outro jogador.
+        Iterator it = s.getJogadores().iterator();
+        while (it.hasNext()) {
+            Jogadores j = (Jogadores) it.next();
+            int[] cod = j.getCodPalavras();
+            for (int i = 0; i < cod.length; i++) {
+                for (int k = 0; k < iguais.size(); k++) {
+                    if (cod[i] == iguais.get(k)) {
+                        cod[i] = 0;
+                    }
+                }
+            }
+        }
+    }
+    
+    public void calcularPontos(Sala s){
+        Iterator itr = s.getJogadores().iterator();
+        while (itr.hasNext()) {
+            Jogadores j = (Jogadores) itr.next();
+            
+            Iterator itr2 = j.getPalavras().iterator();
+            int pts = 0;
+            while (itr2.hasNext()) {
+                String plv = (String) itr2.next();
+                pts += plv.length();
+            }
+            j.setPontos(pts);
+        }
+    }
+    
     private int[] codificarLetras(Map<String, Integer> map, LinkedList<String> palavras){
         int[] plv = new int[palavras.size()];
         
@@ -208,11 +264,13 @@ public class ControllerCliente {
         return plv;
     }
     
-    public String[] decodificarLetras(Map<String, Integer> map, Map<Integer, String> pam, int[] palavras){
-        String[] plv = new String[palavras.length];
+    public LinkedList<String> decodificarLetras(Map<Integer, String> pam, int[] palavras){
+        LinkedList<String> plv = new LinkedList<>();
         
         for (int i = 0; i < palavras.length; i++) {
-            plv[i] = pam.get(palavras[i]);
+            if (palavras[i] !=0) {
+                plv.add(pam.get(palavras[i]));
+            }
         }
         return plv;
     }

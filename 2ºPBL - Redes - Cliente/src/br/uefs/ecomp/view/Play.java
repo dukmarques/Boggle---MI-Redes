@@ -746,11 +746,11 @@ public class Play extends javax.swing.JDialog {
             
             @Override
             public void run(){
-                while (s.getJogadores().size() > 1 || (minutos == 0 && segundos == 0) ) {
+                while (s.getJogadores().size() > 1) {
                         segundos--;
 
                         if (minutos == 0 && segundos == -1) {
-                            return;
+                            break;
                         }
                         if (segundos == -1) {
                             minutos--;
@@ -774,8 +774,9 @@ public class Play extends javax.swing.JDialog {
                 if (s.getJogadores().size() == 1) {
                     JOptionPane.showMessageDialog(null, "Não existe outros participantes em jogo!", "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
                 }else{
+                    System.out.println("Executou ... ");
                     c.enviarLetras(socket, s, jogadorLocal, map, listaPalavras);
-                    Resultado r = new Resultado(null, true, s);
+                    Resultado r = new Resultado(null, true, c, pam, s);
                     r.setVisible(true);
                 }
             }

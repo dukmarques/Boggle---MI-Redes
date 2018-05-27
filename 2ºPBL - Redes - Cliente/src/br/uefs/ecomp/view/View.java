@@ -1,29 +1,20 @@
 package br.uefs.ecomp.view;
 
-import java.util.HashMap;
-import java.util.Map;
+import br.uefs.ecomp.model.Pontos;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class View {
     public static void main(String[] args) throws InterruptedException{
         
-        for (int i = 0; i < 10; i++) {
-            System.out.println(i);
-            if (i == 5) {
-                break;
-            }
-        }
+        ArrayList<Pontos> a = new ArrayList<>();
         
+        Pontos p = new Pontos("DuK", 10);
+        Pontos p2 = new Pontos("Edu", 20);
         
-//        Map<String, Integer> map = new HashMap<>();
-//        Map<Integer, String> pam = new HashMap<>();
-//        
-//        map.put("Cuscuz", 10);
-//        pam.put(10, "Cuscuz");
-//        
-//        map.put("Android", 17);
-//        pam.put(17, "Android");
-//        
-//        System.out.println(map.get("Cuscuz") + " " + pam.get(map.get("Cuscuz")));
-//        System.out.println(map.get("Android") + " " + pam.get(map.get("Android")));
+        a.add(p2);
+        a.add(p);
+        
     }        
 }

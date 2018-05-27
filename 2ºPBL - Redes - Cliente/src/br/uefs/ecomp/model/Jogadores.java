@@ -3,12 +3,15 @@ package br.uefs.ecomp.model;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.LinkedList;
 
 public class Jogadores implements Serializable{
     private String nick;
     private String ip;
     private String porta;
-    private int[] palavras;
+    private int pontos;
+    private int[] codPalavras;
+    private LinkedList<String> palavras;
 
     public Jogadores(String nick) throws UnknownHostException {
         this.nick = nick;
@@ -40,11 +43,27 @@ public class Jogadores implements Serializable{
         this.porta = porta;
     }
 
-    public int[] getPalavras() {
+    public int[] getCodPalavras() {
+        return codPalavras;
+    }
+
+    public void setCodPalavras(int[] codPalavras) {
+        this.codPalavras = codPalavras;
+    }
+
+    public LinkedList<String> getPalavras() {
         return palavras;
     }
 
-    public void setPalavras(int[] palavras) {
+    public void setPalavras(LinkedList<String> palavras) {
         this.palavras = palavras;
+    }
+
+    public int getPontos() {
+        return pontos;
+    }
+
+    public void setPontos(int pontos) {
+        this.pontos = pontos;
     }
 }
