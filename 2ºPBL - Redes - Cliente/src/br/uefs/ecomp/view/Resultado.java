@@ -2,7 +2,9 @@ package br.uefs.ecomp.view;
 
 import br.uefs.ecomp.controller.ControllerCliente;
 import br.uefs.ecomp.model.Jogadores;
+import br.uefs.ecomp.model.Pontos;
 import br.uefs.ecomp.model.Sala;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,7 +16,7 @@ import javax.swing.table.DefaultTableModel;
 public class Resultado extends javax.swing.JDialog {
     private ControllerCliente c;
     private Sala s;
-    private LinkedList<Jogadores> resultado = new LinkedList<>();
+    private LinkedList<Pontos> resultado = new LinkedList<>();
     Map<Integer, String> pam;
     boolean calculando;
     
@@ -30,12 +32,13 @@ public class Resultado extends javax.swing.JDialog {
         this.pam = pam;
         this.s = s;
         configs();
-        test();
+        calculaPontos();
     }
     
     public Resultado(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+        fecharDialogo();
     }
     
     private void configs(){
@@ -63,12 +66,12 @@ public class Resultado extends javax.swing.JDialog {
         
     }
     
-    public void test(){
+    public void calculaPontos(){
         new Thread(){
             @Override
             public void run(){
                 try {
-                    Thread.sleep(10000);
+                    Thread.sleep(5000);
                     c.anularPalavrasIguais(s);
                     decodificarPalavras();
                     calculando = false;
@@ -93,15 +96,43 @@ public class Resultado extends javax.swing.JDialog {
     }
     
     private void listaVencedor(){
-        vencedor.setText(s.getJogadores().getFirst().getNick());
-        DefaultTableModel tabela = (DefaultTableModel) vencedores.getModel();
-        
-        Iterator itr = s.getJogadores().iterator();
-        while (itr.hasNext()) {
-            Jogadores j = (Jogadores) itr.next();
-            tabela.addRow(j.stringResultado());
+        Iterator itera = s.getJogadores().iterator();
+        while (itera.hasNext()) {
+            Jogadores j = (Jogadores) itera.next();
+            Pontos p = new Pontos(j.getNick(), j.getPontos());
+            resultado.add(p);
         }
         
+        Collections.sort(resultado);
+        
+        DefaultTableModel tabela = (DefaultTableModel) vencedores.getModel();
+        vencedor.setText(resultado.getLast().getJogador());
+        
+        for (int i = resultado.size()-1; i >= 0; i--) {
+            String[] s = resultado.get(i).formatTabela();
+            s[0] = (tabela.getRowCount()+1)+s[0];
+            tabela.addRow(s);
+        }
+        
+        fecharDialogo();
+    }
+    
+    public void fecharDialogo(){
+        boolean fechar = false;
+        new Thread(){
+            @Override
+            public void run(){
+                for (int i = 10; i >= 0; i--) {
+                    try {
+                        info.setText("Iniciando nova partida em " + i + " segundos");
+                        Thread.sleep(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(Resultado.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                dispose();
+            }
+        }.start();
     }
 
     /**
@@ -168,6 +199,7 @@ public class Resultado extends javax.swing.JDialog {
 
         info.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         info.setForeground(new java.awt.Color(255, 255, 255));
+        info.setText("test");
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -184,13 +216,10 @@ public class Resultado extends javax.swing.JDialog {
                 .addContainerGap(28, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 247, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(47, 47, 47))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                        .addComponent(info)
-                        .addGap(90, 90, 90))))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 247, Short.MAX_VALUE)
+                    .addComponent(info, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(47, 47, 47))
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -203,7 +232,7 @@ public class Resultado extends javax.swing.JDialog {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(info)
-                .addContainerGap(33, Short.MAX_VALUE))
+                .addContainerGap(16, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());

@@ -68,7 +68,7 @@ public class Jogadores implements Serializable{
     }
 
     public String[] stringResultado() {
-        String[] s = {"1º",this.nick, ""+this.pontos};
+        String[] s = {"",this.nick, ""+this.pontos};
         
         return s;
     }

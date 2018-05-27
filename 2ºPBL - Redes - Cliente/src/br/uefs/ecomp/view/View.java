@@ -8,25 +8,40 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 
 public class View {
     public static void main(String[] args) throws InterruptedException, IOException, ClassNotFoundException{
-        Map<String, Integer> map = new HashMap<>();
-        ControllerCliente c = new ControllerCliente();
-        ManipularArquivo arq = new ManipularArquivo();
+        LinkedList<Pontos> lista = new LinkedList<>();
         
-        map = arq.lerDicSerializado();
+        Pontos p3 = new Pontos("GeL", 9862);
+        Pontos p1 = new Pontos("Edu", 4234);
+        Pontos p2 = new Pontos("DuK", 1234);
         
-        LinkedList<String> list = new LinkedList<>();
-        list.add("NICE");
-        list.add("nice");
+        lista.add(p3);
+        lista.add(p1);
+        lista.add(p2);
         
-        int[] a = c.codificarLetras(map, list);
+        Iterator itr = lista.iterator();
+        while (itr.hasNext()) {
+            Pontos p = (Pontos) itr.next();
+            System.out.println(p.getJogador() + " " + p.getPontos());
+        }
         
-        for (int i = 0; i < a.length; i++) {
-            System.out.println(a[i]);
+        Collections.sort(lista);
+        
+        System.out.println("\nOrdenado: ");
+        Iterator itr2 = lista.iterator();
+        while (itr2.hasNext()) {
+            Pontos p = (Pontos) itr2.next();
+            System.out.println(p.getJogador() + " " + p.getPontos());
+        }
+        
+        System.out.println("\nDecrescete:");
+        for (int i = lista.size()-1; i >= 0 ; i--) {
+            System.out.println(lista.get(i).getJogador());
         }
     }        
 }

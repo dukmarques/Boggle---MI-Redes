@@ -605,17 +605,17 @@ public class Play extends javax.swing.JDialog {
         listaJG.setText(s.stringJogadores());
         
         //log.requestFocus();
-        //log.setCaretPosition(log.getText().length());
         log.setText("Esperando jogadores se conectarem ...");
         log.setText(log.getText()+"\nAproveite para praticar enquanto isso!");
+        log.setCaretPosition(log.getText().length());
     }
     
     public void entrouSala(){
         listaJG.setText(s.stringJogadores());
         
         log.requestFocus();
-        log.setCaretPosition(log.getText().length());
         log.setText("Iniciando partida ... ");
+        log.setCaretPosition(log.getText().length());
         
         c.informarEntradaJogo(socket, s, jogadorLocal);
     }
@@ -674,7 +674,9 @@ public class Play extends javax.swing.JDialog {
 
                     //Codificação for 1 significa que um novo jogador iniciou a partida.
                     if (com.getRequisicao() == 1) {
-                        log.setText(log.getText()+"\n"+com.getJogador().getNick() + " entrou na partida!");
+                        log.setText(log.getText()+"\n"+com.getJogador().getNick() + " entrou na partida.");
+                        log.setCaretPosition(log.getText().length());
+                        
                         s.getJogadores().add(com.getJogador());
                         listaJG.setText(s.stringJogadores());
 
@@ -697,6 +699,7 @@ public class Play extends javax.swing.JDialog {
                     if (com.getRequisicao() == 2) {
 
                         log.setText(log.getText() + "\n" + com.getJogador().getNick() + " saiu da partida!");
+                        log.setCaretPosition(log.getText().length());
                         c.removeJogadorSala(s, com.getJogador());
 
                         if (adm.getNick().equals(com.getJogador().getNick())) {
@@ -711,7 +714,8 @@ public class Play extends javax.swing.JDialog {
                     if (com.getRequisicao() == 3 && !start) {
                         int[] tempo = com.getTempo();
                         log.setText(log.getText()+"\nPartida iniciada");
-
+                        log.setCaretPosition(log.getText().length());
+                        
                         iniciarJogo(tempo[0], tempo[1], tempo[2]);
                         gerarLetras(com.getDados());
                         return;
@@ -735,9 +739,26 @@ public class Play extends javax.swing.JDialog {
         }.start();
     }
     
+    public void startJogo(int min, int seg, int prog){
+        new Thread(){
+            @Override
+            public void run(){
+                while (s.getJogadores().size() > 1) {
+                    for (int i = 5; i >=0; i--) {
+                        log.setText(log.getText() + "\nIniciando a partida em " + i + " segundos.");
+                        log.setCaretPosition(log.getText().length());
+                    }
+                    iniciarJogo(min, seg, prog);
+                }
+            }
+        }.start();
+    }
+    
     //Inicia a partida assim que mais de um jogador se conecta a sala.
     public void iniciarJogo(int min, int seg, int prog){
         log.setText(log.getText() + "\nPartida iniciada.");
+        log.setCaretPosition(log.getText().length());
+        
         this.start = true;
         
         this.segundos = seg; this.minutos = min;
@@ -765,15 +786,17 @@ public class Play extends javax.swing.JDialog {
                         progress.setValue(progresso);
 
                     try {
-                        Thread.sleep(500);
+                        Thread.sleep(1000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
                     }
                 }
                 //Verifica se o cliente é o único jogador em sala, caso seja é exibido uma mensagem para ele e não é feito o calculo de vitória.
                 if (s.getJogadores().size() == 1) {
+                    start = false;
                     JOptionPane.showMessageDialog(null, "Não existe outros participantes em jogo!", "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
                 }else{
+                    start = false;
                     //Envia as letras que ele formou para os outros jogadores.
                     c.enviarLetras(socket, s, jogadorLocal, map, listaPalavras);
                     
