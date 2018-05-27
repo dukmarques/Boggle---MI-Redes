@@ -157,8 +157,9 @@ public class ControllerCliente {
     }
     
     public void enviarLetras(MulticastSocket socket, Sala s, Jogadores j, Map<String, Integer> map, LinkedList<String> palavras){
+        j.setCodPalavras(codificarLetras(map, palavras));
         ComunicacaoJogo c = new ComunicacaoJogo(5, j);
-        c.setPalavras(codificarLetras(map, palavras));
+        addPontosJogador(s, j);
         
         comunicarSala(socket, s, c, "236.52.65.9");
     }
@@ -191,8 +192,7 @@ public class ControllerCliente {
         while (itr.hasNext()) {
             Jogadores jg = (Jogadores) itr.next();
             if (jg.getNick().equals(j.getNick())) {
-                jg.setPalavras(j.getPalavras());
-                break;
+                jg.setCodPalavras(j.getCodPalavras());
             }
         }
     }
@@ -210,7 +210,7 @@ public class ControllerCliente {
             while (itr2.hasNext()) {
                 Jogadores jg = (Jogadores) itr2.next();
                 int[] p2 = jg.getCodPalavras();
-
+                
                 if (!jg.getNick().equals(j.getNick())) {
                     for (int i = 0; i < p1.length; i++) {
                         for (int k = 0; k < p2.length; k++) {
@@ -253,13 +253,18 @@ public class ControllerCliente {
         }
     }
     
-    private int[] codificarLetras(Map<String, Integer> map, LinkedList<String> palavras){
+    public int[] codificarLetras(Map<String, Integer> map, LinkedList<String> palavras){
         int[] plv = new int[palavras.size()];
         
         Iterator itr = palavras.iterator();
         for (int i = 0; itr.hasNext(); i++) {
             String p = (String) itr.next();
-            plv[i] = map.get(p);
+            
+            if (map.get(p.toLowerCase()) != null) {
+                plv[i] = map.get(p.toLowerCase());
+            }else{
+                plv[i] = map.get(p.toUpperCase());
+            }
         }
         return plv;
     }

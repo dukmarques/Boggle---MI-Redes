@@ -29,13 +29,13 @@ public class Resultado extends javax.swing.JDialog {
         this.c = c;
         this.pam = pam;
         this.s = s;
+        configs();
+        test();
     }
     
     public Resultado(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
-        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
-        configs();
     }
     
     private void configs(){
@@ -61,10 +61,23 @@ public class Resultado extends javax.swing.JDialog {
             }
         }.start();
         
-        c.anularPalavrasIguais(s);
-        decodificarPalavras();
-        calculando = false;
-        listaVencedor();
+    }
+    
+    public void test(){
+        new Thread(){
+            @Override
+            public void run(){
+                try {
+                    Thread.sleep(10000);
+                    c.anularPalavrasIguais(s);
+                    decodificarPalavras();
+                    calculando = false;
+                    listaVencedor();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(Resultado.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }.start();
     }
     
     
@@ -80,7 +93,14 @@ public class Resultado extends javax.swing.JDialog {
     }
     
     private void listaVencedor(){
+        vencedor.setText(s.getJogadores().getFirst().getNick());
         DefaultTableModel tabela = (DefaultTableModel) vencedores.getModel();
+        
+        Iterator itr = s.getJogadores().iterator();
+        while (itr.hasNext()) {
+            Jogadores j = (Jogadores) itr.next();
+            tabela.addRow(j.stringResultado());
+        }
         
     }
 
@@ -97,7 +117,7 @@ public class Resultado extends javax.swing.JDialog {
         jLabel1 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         vencedores = new javax.swing.JTable();
-        jLabel2 = new javax.swing.JLabel();
+        vencedor = new javax.swing.JLabel();
         info = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
@@ -110,14 +130,7 @@ public class Resultado extends javax.swing.JDialog {
 
         vencedores.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null},
-                {null, null, null}
+
             },
             new String [] {
                 "Posição", "Nick", "Pontos"
@@ -142,15 +155,16 @@ public class Resultado extends javax.swing.JDialog {
         jScrollPane1.setViewportView(vencedores);
         if (vencedores.getColumnModel().getColumnCount() > 0) {
             vencedores.getColumnModel().getColumn(0).setResizable(false);
-            vencedores.getColumnModel().getColumn(0).setPreferredWidth(50);
+            vencedores.getColumnModel().getColumn(0).setPreferredWidth(10);
             vencedores.getColumnModel().getColumn(1).setResizable(false);
             vencedores.getColumnModel().getColumn(2).setResizable(false);
+            vencedores.getColumnModel().getColumn(2).setPreferredWidth(10);
         }
 
-        jLabel2.setFont(new java.awt.Font("Maiandra GD", 1, 18)); // NOI18N
-        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/win.png"))); // NOI18N
-        jLabel2.setText("Jogador");
+        vencedor.setFont(new java.awt.Font("Maiandra GD", 1, 18)); // NOI18N
+        vencedor.setForeground(new java.awt.Color(255, 255, 255));
+        vencedor.setIcon(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/win.png"))); // NOI18N
+        vencedor.setText("Jogador");
 
         info.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         info.setForeground(new java.awt.Color(255, 255, 255));
@@ -166,7 +180,7 @@ public class Resultado extends javax.swing.JDialog {
                         .addComponent(jLabel1))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(104, 104, 104)
-                        .addComponent(jLabel2)))
+                        .addComponent(vencedor)))
                 .addContainerGap(28, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGap(0, 0, Short.MAX_VALUE)
@@ -184,7 +198,7 @@ public class Resultado extends javax.swing.JDialog {
                 .addContainerGap()
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jLabel2)
+                .addComponent(vencedor)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 158, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -258,9 +272,9 @@ public class Resultado extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel info;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel2;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel vencedor;
     private javax.swing.JTable vencedores;
     // End of variables declaration//GEN-END:variables
 }

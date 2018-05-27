@@ -765,7 +765,7 @@ public class Play extends javax.swing.JDialog {
                         progress.setValue(progresso);
 
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(500);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
                     }
@@ -774,8 +774,9 @@ public class Play extends javax.swing.JDialog {
                 if (s.getJogadores().size() == 1) {
                     JOptionPane.showMessageDialog(null, "Não existe outros participantes em jogo!", "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
                 }else{
-                    System.out.println("Executou ... ");
+                    //Envia as letras que ele formou para os outros jogadores.
                     c.enviarLetras(socket, s, jogadorLocal, map, listaPalavras);
+                    
                     Resultado r = new Resultado(null, true, c, pam, s);
                     r.setVisible(true);
                 }

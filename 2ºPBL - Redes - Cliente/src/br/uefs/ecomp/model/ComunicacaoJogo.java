@@ -7,7 +7,6 @@ public class ComunicacaoJogo implements Serializable {
     private Jogadores jogador;
     private String[] dados;
     private int[] tempo;
-    private int[] palavras;
 
     public ComunicacaoJogo(int requisicao, Jogadores jogador) {
         this.requisicao = requisicao;
@@ -46,13 +45,5 @@ public class ComunicacaoJogo implements Serializable {
         
         
         this.tempo = tempo;
-    }
-
-    public int[] getPalavras() {
-        return palavras;
-    }
-
-    public void setPalavras(int[] palavras) {
-        this.palavras = palavras;
     }
 }
