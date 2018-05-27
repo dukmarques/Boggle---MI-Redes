@@ -4,7 +4,7 @@ import br.uefs.ecomp.model.Comunicacao;
 import br.uefs.ecomp.model.ComunicacaoJogo;
 import br.uefs.ecomp.model.Jogadores;
 import br.uefs.ecomp.model.Sala;
-import java.io.ByteArrayInputStream;
+import br.uefs.ecomp.util.ManipularArquivo;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -12,7 +12,6 @@ import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
@@ -20,18 +19,22 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 public class ControllerCliente {
     private LinkedList<Sala> listaSalas;
-    
+    private String[] config;
     private MulticastSocket socketSS;
     
     //Métodos para comunicação com o servidor!
     public LinkedList<Sala> getSalas(Comunicacao c) throws ClassNotFoundException{
         try {
-            Socket cliente = new Socket("127.0.0.1", 1223);
+            if (config == null) {
+                ManipularArquivo arq = new ManipularArquivo();
+                config = arq.lerArquivo();
+            }
+            
+            Socket cliente = new Socket(config[0], Integer.parseInt(config[1]));
             ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
             oos.flush();
             oos.writeObject(c);
@@ -50,7 +53,11 @@ public class ControllerCliente {
     
     private Sala requisitaServer(Comunicacao c) throws ClassNotFoundException{
         try{
-            Socket cliente = new Socket("127.0.0.1", 1223);
+            if (config == null) {
+                ManipularArquivo arq = new ManipularArquivo();
+                config = arq.lerArquivo();
+            }
+            Socket cliente = new Socket(config[0], Integer.parseInt(config[1]));
             
             ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
             oos.flush();
@@ -92,7 +99,11 @@ public class ControllerCliente {
             c.setJogador(j);
             c.setNumSala(s.getNum());
             
-            Socket cliente = new Socket("127.0.0.1", 1223);
+            if (config == null) {
+                ManipularArquivo arq = new ManipularArquivo();
+                config = arq.lerArquivo();
+            }
+            Socket cliente = new Socket(config[0], Integer.parseInt(config[1]));
             
             ObjectOutputStream oos = new ObjectOutputStream(cliente.getOutputStream());
             oos.flush();
@@ -211,7 +222,7 @@ public class ControllerCliente {
                 Jogadores jg = (Jogadores) itr2.next();
                 int[] p2 = jg.getCodPalavras();
                 
-                if (!jg.getNick().equals(j.getNick())) {
+                if (!jg.getIp().equals(j.getIp())) {
                     for (int i = 0; i < p1.length; i++) {
                         for (int k = 0; k < p2.length; k++) {
                             if (p1[i] == p2[k]) {

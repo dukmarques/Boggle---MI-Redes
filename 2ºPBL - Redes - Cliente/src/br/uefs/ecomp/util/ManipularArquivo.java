@@ -96,4 +96,18 @@ public class ManipularArquivo {
             Logger.getLogger(ManipularArquivo.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    //Classe utilizada para ler o arquivo de texto contendo o ip e porta do servidor.
+    public String[] lerArquivo() throws FileNotFoundException, IOException{
+        BufferedReader read = new BufferedReader(new FileReader("config.txt"));
+        
+        String l;
+        String[] config = new String[2];
+        
+        for (int i = 0; i < 2; i++) {
+            l = read.readLine();
+            config[i] = l;
+        }
+        return config;
+    }
 }

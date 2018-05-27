@@ -667,9 +667,9 @@ public class Play extends javax.swing.JDialog {
             @Override
             public void run(){
                 //Caso a requisição recebida seja a do mesmo jogador que a enviou ela é ignorada.
-                System.out.println("Jogador: " + com.getJogador().getNick() + " r: " + com.getRequisicao());
+                //utilizado para testes System.out.println("Jogador: " + com.getJogador().getNick() + " r: " + com.getRequisicao());
 
-                if (!com.getJogador().getNick().equals(jogadorLocal.getNick())) {
+                if (!com.getJogador().getIp().equals(jogadorLocal.getIp())) {
                     //System.out.println("Requisição " + com.getRequisicao() + " do jogador: " + com.getJogador().getNick());
 
                     //Codificação for 1 significa que um novo jogador iniciou a partida.
@@ -698,7 +698,7 @@ public class Play extends javax.swing.JDialog {
                     //Se a codificação for 2, significa que algum jogador se desconectou da partida!
                     if (com.getRequisicao() == 2) {
 
-                        log.setText(log.getText() + "\n" + com.getJogador().getNick() + " saiu da partida!");
+                        log.setText(log.getText() + "\n" + com.getJogador().getNick() + " saiu da partida.");
                         log.setCaretPosition(log.getText().length());
                         c.removeJogadorSala(s, com.getJogador());
 
