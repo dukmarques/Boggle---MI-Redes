@@ -691,7 +691,7 @@ public class Play extends javax.swing.JDialog {
                             c.iniciarPartida(socket, s, jogadorLocal, letras);
 
                             gerarLetras(letras);
-                            iniciarJogo(2, 60, 0);
+                            startJogo(2, 60, 0);
                         }
                         return;
                     }
@@ -716,7 +716,7 @@ public class Play extends javax.swing.JDialog {
                         log.setText(log.getText()+"\nPartida iniciada");
                         log.setCaretPosition(log.getText().length());
                         
-                        iniciarJogo(tempo[0], tempo[1], tempo[2]);
+                        startJogo(tempo[0], tempo[1], tempo[2]);
                         gerarLetras(com.getDados());
                         return;
                     }
@@ -724,7 +724,7 @@ public class Play extends javax.swing.JDialog {
                     //Se a codificação for 4 o ADM está dando inicio a partida!
                     if (com.getRequisicao() == 4) {
                         gerarLetras(com.getDados());
-                        iniciarJogo(2, 60, 0);
+                        startJogo(2, 60, 0);
 
                         return;
                     }
