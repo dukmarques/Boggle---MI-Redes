@@ -64,7 +64,7 @@ public class Play extends javax.swing.JDialog {
         this.s = s;
         this.map = map;
         this.pam = pam;
-        
+        this.info.setText(info.getText()+ s.getNum());
         this.jogadorLocal = j;
         startMulticast(); //Inicia o multicast do jogo!
         
@@ -376,7 +376,7 @@ public class Play extends javax.swing.JDialog {
 
         info.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         info.setForeground(new java.awt.Color(255, 255, 255));
-        info.setText("Log");
+        info.setText("Log Sala ");
 
         listaJG.setEditable(false);
         listaJG.setBackground(new java.awt.Color(255, 102, 0));
@@ -396,10 +396,6 @@ public class Play extends javax.swing.JDialog {
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(jLabel1)
-                        .addGap(52, 52, 52))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel1Layout.createSequentialGroup()
@@ -451,7 +447,11 @@ public class Play extends javax.swing.JDialog {
                                 .addComponent(b15, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(b16, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addGap(0, 0, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addGap(31, 31, 31)))
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 258, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 78, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -468,8 +468,8 @@ public class Play extends javax.swing.JDialog {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2))
+                    .addComponent(jLabel2)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(jPanel1Layout.createSequentialGroup()
@@ -615,7 +615,7 @@ public class Play extends javax.swing.JDialog {
         
         log.requestFocus();
         log.setCaretPosition(log.getText().length());
-        log.setText("Jogo iniciado...");
+        log.setText("Iniciando partida ... ");
         
         c.informarEntradaJogo(socket, s, jogadorLocal);
     }
@@ -663,67 +663,79 @@ public class Play extends javax.swing.JDialog {
     
     //Método que trata as requisições feita na tela de jogo!
     public void requisicoes(ComunicacaoJogo com){
-        //Caso a requisição recebida seja a do mesmo jogador que a enviou ela é ignorada.
-        System.out.println("Jogador: " + com.getJogador().getNick() + " r: " + com.getRequisicao());
-        
-        if (!com.getJogador().getNick().equals(jogadorLocal.getNick())) {
-            //System.out.println("Requisição " + com.getRequisicao() + " do jogador: " + com.getJogador().getNick());
-            
-            //Codificação for 1 significa que um novo jogador iniciou a partida.
-            if (com.getRequisicao() == 1) {
-                log.setText(log.getText()+"\n"+com.getJogador().getNick() + " entrou na partida!");
-                s.getJogadores().add(com.getJogador());
-                listaJG.setText(s.stringJogadores());
-                
-                //Se a rodada já foi iniciada e o cliente for o adm da rodada, ele envia os dados da partida!
-                if (start && adm.getNick().equals(jogadorLocal.getNick())) {
-                    c.enviarDadosDaPartida(socket, s, jogadorLocal, letras, minutos, segundos, progress.getValue());
-                }else if(!start && s.getJogadores().size() == 2){
-                    //Inicia a partida!
-                    LetrasDados l = new LetrasDados();
-                    letras = l.letrasSort();
+        new Thread(){
+            @Override
+            public void run(){
+                //Caso a requisição recebida seja a do mesmo jogador que a enviou ela é ignorada.
+                System.out.println("Jogador: " + com.getJogador().getNick() + " r: " + com.getRequisicao());
+
+                if (!com.getJogador().getNick().equals(jogadorLocal.getNick())) {
+                    //System.out.println("Requisição " + com.getRequisicao() + " do jogador: " + com.getJogador().getNick());
+
+                    //Codificação for 1 significa que um novo jogador iniciou a partida.
+                    if (com.getRequisicao() == 1) {
+                        log.setText(log.getText()+"\n"+com.getJogador().getNick() + " entrou na partida!");
+                        s.getJogadores().add(com.getJogador());
+                        listaJG.setText(s.stringJogadores());
+
+                        //Se a rodada já foi iniciada e o cliente for o adm da rodada, ele envia os dados da partida!
+                        if (start && adm.getNick().equals(jogadorLocal.getNick())) {
+                            c.enviarDadosDaPartida(socket, s, jogadorLocal, letras, minutos, segundos, progress.getValue());
+                        }else if(!start && s.getJogadores().size() == 2){
+                            //Inicia a partida!
+                            LetrasDados l = new LetrasDados();
+                            letras = l.letrasSort();
+
+                            c.iniciarPartida(socket, s, jogadorLocal, letras);
+
+                            gerarLetras(letras);
+                            iniciarJogo(2, 60, 0);
+                        }
+                        return;
+                    }
+                    //Se a codificação for 2, significa que algum jogador se desconectou da partida!
+                    if (com.getRequisicao() == 2) {
+
+                        log.setText(log.getText() + "\n" + com.getJogador().getNick() + " saiu da partida!");
+                        c.removeJogadorSala(s, com.getJogador());
+
+                        if (adm.getNick().equals(com.getJogador().getNick())) {
+                            adm = s.getJogadores().getFirst();
+                            System.out.println("Novo Adm da sala: " + adm.getNick());
+                        }
+                        listaJG.setText(s.stringJogadores());
+                        return;
+                    }
+
+                    //Se a codificação for 3 e o jogo não estiver iniciado, significa que é a resposta do ADM pra alguém que acabou de entrar.
+                    if (com.getRequisicao() == 3 && !start) {
+                        int[] tempo = com.getTempo();
+                        log.setText(log.getText()+"\nPartida iniciada");
+
+                        iniciarJogo(tempo[0], tempo[1], tempo[2]);
+                        gerarLetras(com.getDados());
+                        return;
+                    }
+
+                    //Se a codificação for 4 o ADM está dando inicio a partida!
+                    if (com.getRequisicao() == 4) {
+                        gerarLetras(com.getDados());
+                        iniciarJogo(2, 60, 0);
+
+                        return;
+                    }
                     
-                    c.iniciarPartida(socket, s, jogadorLocal, letras);
-                    
-                    gerarLetras(letras);
-                    iniciarJogo(2, 60, 0);
+                    //Se a codificação for 5, algum jogador está enviando as letras que ele formou!
+                    if (com.getRequisicao() == 5) {
+                        c.addPontosJogador(s, com.getJogador());
+                        return;
+                    }
                 }
-                return;
             }
-            //Se a codificação for 2, significa que algum jogador se desconectou da partida!
-            if (com.getRequisicao() == 2) {
-                
-                log.setText(log.getText() + "\n" + com.getJogador().getNick() + " saiu da partida!");
-                c.removeJogadorSala(s, com.getJogador());
-                
-                if (adm.getNick().equals(com.getJogador().getNick())) {
-                    adm = s.getJogadores().getFirst();
-                    System.out.println("Novo Adm da sala: " + adm.getNick());
-                }
-                listaJG.setText(s.stringJogadores());
-                return;
-            }
-            
-            //Se a codificação for 3 e o jogo não estiver iniciado, significa que é a resposta do ADM pra alguém que acabou de entrar.
-            if (com.getRequisicao() == 3 && !start) {
-                int[] tempo = com.getTempo();
-                log.setText(log.getText()+"\nPartida iniciada");
-                
-                iniciarJogo(tempo[0], tempo[1], tempo[2]);
-                gerarLetras(com.getDados());
-                return;
-            }
-            
-            //Se a codificação for 4 o ADM está dando inicio a partida!
-            if (com.getRequisicao() == 4) {
-                gerarLetras(com.getDados());
-                iniciarJogo(2, 60, 0);
-                
-                return;
-            }
-        }
+        }.start();
     }
     
+    //Inicia a partida assim que mais de um jogador se conecta a sala.
     public void iniciarJogo(int min, int seg, int prog){
         log.setText(log.getText() + "\nPartida iniciada.");
         this.start = true;
@@ -731,11 +743,10 @@ public class Play extends javax.swing.JDialog {
         this.segundos = seg; this.minutos = min;
         new Thread(){
         int progresso = prog;
-            //int segundos = seg, minutos = min, progresso = prog;
             
             @Override
             public void run(){
-                while (s.getJogadores().size() > 1) {
+                while (s.getJogadores().size() > 1 || (minutos == 0 && segundos == 0) ) {
                         segundos--;
 
                         if (minutos == 0 && segundos == -1) {
@@ -758,6 +769,14 @@ public class Play extends javax.swing.JDialog {
                     } catch (InterruptedException ex) {
                         Logger.getLogger(Play.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                }
+                //Verifica se o cliente é o único jogador em sala, caso seja é exibido uma mensagem para ele e não é feito o calculo de vitória.
+                if (s.getJogadores().size() == 1) {
+                    JOptionPane.showMessageDialog(null, "Não existe outros participantes em jogo!", "Fim de Jogo", JOptionPane.INFORMATION_MESSAGE);
+                }else{
+                    c.enviarLetras(socket, s, jogadorLocal, map, listaPalavras);
+                    Resultado r = new Resultado(null, true, s);
+                    r.setVisible(true);
                 }
             }
         }.start();

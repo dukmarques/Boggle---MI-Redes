@@ -8,6 +8,7 @@ public class Jogadores implements Serializable{
     private String nick;
     private String ip;
     private String porta;
+    private int[] palavras;
 
     public Jogadores(String nick) throws UnknownHostException {
         this.nick = nick;
@@ -37,5 +38,13 @@ public class Jogadores implements Serializable{
 
     public void setPorta(String porta) {
         this.porta = porta;
+    }
+
+    public int[] getPalavras() {
+        return palavras;
+    }
+
+    public void setPalavras(int[] palavras) {
+        this.palavras = palavras;
     }
 }

@@ -17,6 +17,7 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -154,81 +155,14 @@ public class ControllerCliente {
         c.setDados(letras);
         comunicarSala(socket, s, c, "236.52.65.9");
     }
-
-    //Métodos para comunicacao multicast sala
-//    public void startMulticast(Sala s, javax.swing.JTable tabela, Jogadores j){
-//        try {
-//            socket = new MulticastSocket(s.getPorta());
-//            InetAddress enderecoMulticast = InetAddress.getByName("236.52.65.8");
-//            socket.joinGroup(enderecoMulticast);
-//            
-//            byte[] recebe = new byte[1024];
-//            DatagramPacket datagrama = new DatagramPacket(recebe, recebe.length);
-//            
-//            //Thread para conexão.
-//            new Thread(){
-//                @Override
-//                public void run(){
-//                    while (true) {
-//                        try {
-//                            socket.receive(datagrama);
-//                           
-//                            byte[] recebido = datagrama.getData();
-//                            ByteArrayInputStream bais = new ByteArrayInputStream(recebido);
-//                            ObjectInputStream ois = new ObjectInputStream(bais);
-//                            ComunicacaoJogo c = (ComunicacaoJogo) ois.readObject();
-//                            
-//                            trataComunicacao(s, c, tabela, j);
-//                        } catch (IOException ex) {
-//                            Logger.getLogger(SalaPlay.class.getName()).log(Level.SEVERE, null, ex);
-//                        } catch (ClassNotFoundException ex) {
-//                            Logger.getLogger(ControllerCliente.class.getName()).log(Level.SEVERE, null, ex);
-//                        }
-//                    }
-//                }
-//            }.start();
-//            
-//        } catch (IOException ex) {
-//            Logger.getLogger(ControllerCliente.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//    }
     
-    public void trataComunicacao(Sala s, ComunicacaoJogo c, javax.swing.JTable tabela, Jogadores j){
+    public void enviarLetras(MulticastSocket socket, Sala s, Jogadores j, Map<String, Integer> map, LinkedList<String> palavras){
+        ComunicacaoJogo c = new ComunicacaoJogo(5, j);
+        c.setPalavras(codificarLetras(map, palavras));
         
-        System.out.println("Mensagem recebida no Multicast do jogador :" + c.getJogador().getNick() + "info:" + c.getRequisicao());
-        if (!c.getJogador().getNick().equals(j.getNick())) {
-            //Se a codificação for 1. significa que um novo jogador se conectou a sala.
-            if (c.getRequisicao() == 1) {
-                //Adiciona o novo jogador na lista de salas.
-                s.getJogadores().add(c.getJogador());
-                addJGTabela(tabela, s);
-                return;
-            }
-            //Codificação for 2, significa que um jogador saiu da sala.
-            if (c.getRequisicao() == 2) {
-                removeJogadorSala(s, c.getJogador()); //Remove o jogador da sala.
-                addJGTabela(tabela, s); //Atualiza a tabela.
-                return;
-            }
-            
-            //Significa que alguém deseja jogar.
-            if (c.getRequisicao() == 3) {
-                
-            }
-        }
+        comunicarSala(socket, s, c, "236.52.65.9");
     }
-    
-//    public void avisarEntrouSala(Sala s, Jogadores j){
-//        ComunicacaoJogo c = new ComunicacaoJogo(1, j);
-//        comunicarSala(s, c, "236.52.65.8");
-//    }
-//    
-//    public boolean iniciarJogo(Sala s, Jogadores j){
-//        ComunicacaoJogo c = new ComunicacaoJogo(3 , j);
-//        comunicarSala(s, c, "236.52.65.8");
-//        return true;
-//    }
-    
+
     //Métodos de apoio --------------------------------------------------------
     public void addJGTabela(javax.swing.JTable tabela, Sala s){
         DefaultTableModel tbl = (DefaultTableModel) tabela.getModel();
@@ -250,5 +184,36 @@ public class ControllerCliente {
                 s.getJogadores().remove(jg);
             }
         }
+    }
+    
+    public void addPontosJogador(Sala s, Jogadores j){
+        Iterator itr = s.getJogadores().iterator();
+        while (itr.hasNext()) {
+            Jogadores jg = (Jogadores) itr.next();
+            if (jg.getNick().equals(j.getNick())) {
+                jg.setPalavras(j.getPalavras());
+                break;
+            }
+        }
+    }
+    
+    private int[] codificarLetras(Map<String, Integer> map, LinkedList<String> palavras){
+        int[] plv = new int[palavras.size()];
+        
+        Iterator itr = palavras.iterator();
+        for (int i = 0; itr.hasNext(); i++) {
+            String p = (String) itr.next();
+            plv[i] = map.get(p);
+        }
+        return plv;
+    }
+    
+    public String[] decodificarLetras(Map<String, Integer> map, Map<Integer, String> pam, int[] palavras){
+        String[] plv = new String[palavras.length];
+        
+        for (int i = 0; i < palavras.length; i++) {
+            plv[i] = pam.get(palavras[i]);
+        }
+        return plv;
     }
 }
