@@ -601,6 +601,7 @@ public class Play extends javax.swing.JDialog {
     }//GEN-LAST:event_b16ActionPerformed
     //Fim das funções de cada letra.
     
+    //Caso o jogador tenha criado a sala ele iniciar as configurações deste método e aguarda que outro jogador se conect.
     public void startConfigs(){
         listaJG.setText(s.stringJogadores());
         
@@ -610,6 +611,7 @@ public class Play extends javax.swing.JDialog {
         log.setCaretPosition(log.getText().length());
     }
     
+    //Caso o jogador entrou na sala ele avisa aos demais que entrou e aguarda o inicio da partida.
     public void entrouSala(){
         listaJG.setText(s.stringJogadores());
         

@@ -18,22 +18,9 @@ import javax.swing.table.DefaultTableModel;
 
 public class TelaPrincipal extends javax.swing.JFrame {
     private ControllerCliente c = new ControllerCliente();
-    private Map<String, Integer> map = new HashMap<>();
-    private Map<Integer, String> pam = new HashMap<>();
+    private Map<String, Integer> map = new HashMap<>(); //HashMap utilizada para verificar palavras e codifica-las.
+    private Map<Integer, String> pam = new HashMap<>(); //HashMap utilizada para decodificar as palavras.
     LinkedList<Sala> listaSalas;
-    
-    public TelaPrincipal(ControllerCliente c, Map<String, Integer> map, Map<Integer, String> pam) {
-        initComponents();
-        this.setIconImage(new javax.swing.ImageIcon(getClass().getResource("/br/uefs/ecomp/icons/b.png")).getImage());
-        formatColumn();
-        
-        this.c = c;
-        this.map = map;
-        this.pam = pam;
-        
-        infoTP.setVisible(false);
-        getSalas();
-    }
     
     public TelaPrincipal() {
         initComponents();
@@ -41,7 +28,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         formatColumn();
         
         try {
-            lerDic();
+            lerDic(); //Ler o dicionário de letras.
         } catch (IOException ex) {
             Logger.getLogger(TelaPrincipal.class.getName()).log(Level.SEVERE, null, ex);
         } catch (ClassNotFoundException ex) {
@@ -211,6 +198,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
+    //Método utilizado para entrar numa sala solicitando ao servidor.
     private void entrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_entrarActionPerformed
         DefaultTableModel tabela =  (DefaultTableModel) salas.getModel();
         if (!c.validaNick(nick)) {
@@ -245,6 +233,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_entrarActionPerformed
 
+    //Atualiza a lista de salas através de requisição ao servidor.
     private void atualizarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_atualizarActionPerformed
         try {
             Comunicacao comunic = new Comunicacao(1);
@@ -272,6 +261,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_atualizarActionPerformed
 
+    //Método utilizado para listar as salas quando o jogo é iniciado.
     private void getSalas(){
         Comunicacao comunic = new Comunicacao(1);
         
@@ -316,6 +306,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         criar.setEnabled(b);
     }
     
+    //Método utilizado para criar uma sala.
     private void criarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_criarActionPerformed
         if (!c.validaNick(nick)) {
             JOptionPane.showMessageDialog(null, "Porfavor insira um apelido válido!", "Erro", JOptionPane.ERROR_MESSAGE);
@@ -351,7 +342,7 @@ public class TelaPrincipal extends javax.swing.JFrame {
         pam = arq.lerPamSerializado();
     }
     
-    
+    //Formata a coluna da tabela de exibição de salas.
     private void formatColumn(){
         salas.getColumnModel().getColumn(1).setPreferredWidth(350);
     }

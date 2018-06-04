@@ -51,6 +51,7 @@ public class ControllerCliente {
         }
     }
     
+    //Método utilizado para enviar uma mensagem ao servidor
     private Sala requisitaServer(Comunicacao c) throws ClassNotFoundException{
         try{
             if (config == null) {
@@ -73,6 +74,7 @@ public class ControllerCliente {
         }
     }
     
+    //Método utilizado para criar a sala através da comunicação com o servidor.
     public Sala criarSala(Jogadores jogador) throws ClassNotFoundException, UnknownHostException{
         Comunicacao c = new Comunicacao(2);
         //Jogadores jg = new Jogadores(jogador);
@@ -82,6 +84,7 @@ public class ControllerCliente {
         return s;
     }
     
+    //Método utilizado para entrar na sala, caso o servidor a permita.
     public Sala entrarSala(Jogadores jogador, int numSala) throws ClassNotFoundException, UnknownHostException{
         Comunicacao c = new Comunicacao(3);
         //Jogadores jg = new Jogadores(jogador);
@@ -115,6 +118,7 @@ public class ControllerCliente {
         }
     }
     
+    //Utilizado para validar o nick do jogador, evitando que ele crie um nick vázio
     public boolean validaNick(javax.swing.JTextField nick){
         if (nick.getText().trim().length() == 0 || nick.getText().equals("")) {
             return false;
@@ -123,6 +127,8 @@ public class ControllerCliente {
     }
     
     //Métodos da sala de jogo
+    
+    //Método utilizado para enviar datagramas para a sala multicast
     private void comunicarSala(MulticastSocket socket, Sala s, ComunicacaoJogo c, String endereco){
         try {
             InetAddress enderecoMulticast = InetAddress.getByName(endereco);
@@ -140,16 +146,19 @@ public class ControllerCliente {
         }
     }
     
+    //Envia uma mensagem a sala informando que entrou na partida.
     public void informarEntradaJogo(MulticastSocket socket, Sala s, Jogadores j){
         ComunicacaoJogo c = new ComunicacaoJogo(1, j);
         comunicarSala(socket, s, c, "236.52.65.9");
     }
     
+    //Enviar uma mensagem a sala informando que se desconectou da partida.
     public void informarSaidaJogo(MulticastSocket socket, Sala s, Jogadores j){
         ComunicacaoJogo c = new ComunicacaoJogo(2, j);
         comunicarSala(socket, s, c, "236.52.65.9");
     }
 
+    //Método utilizado para o adm da sala enviar os dados da partida caso a mesma ja esteja em andamento.
     public void enviarDadosDaPartida(MulticastSocket socket, Sala s, Jogadores j, String[] letras, int min, int seg, int prog){
         ComunicacaoJogo c = new ComunicacaoJogo(3, j);
         c.setDados(letras);
@@ -161,6 +170,7 @@ public class ControllerCliente {
         comunicarSala(socket, s, c, "236.52.65.9");
     }
     
+    //Método utilizado pelo adm da sala para dar inicio a partida!
     public void iniciarPartida(MulticastSocket socket, Sala s, Jogadores j, String[] letras){
         ComunicacaoJogo c = new ComunicacaoJogo(4, j);
         c.setDados(letras);
@@ -208,6 +218,7 @@ public class ControllerCliente {
         }
     }
     
+    //Método responsável por comparar todas as letras formadas pelos jogadores e remover as que forem iguais.
     public void anularPalavrasIguais(Sala s){
         LinkedList<Integer> iguais = new LinkedList<>();
         Iterator itr = s.getJogadores().iterator();
@@ -249,6 +260,7 @@ public class ControllerCliente {
         }
     }
     
+    //Calcula os pontos do jogador com base no tamanho das palavras, para cada letra 1 ponto.
     public void calcularPontos(Sala s){
         Iterator itr = s.getJogadores().iterator();
         while (itr.hasNext()) {
@@ -264,6 +276,8 @@ public class ControllerCliente {
         }
     }
     
+    //Recebe a lista de letras do jogador e transforma num array de inteiros, onde cada inteiro é o código da letra
+    //Usado para diminuir a quantidade de dados enviados no multicast.
     public int[] codificarLetras(Map<String, Integer> map, LinkedList<String> palavras){
         int[] plv = new int[palavras.size()];
         
@@ -280,6 +294,7 @@ public class ControllerCliente {
         return plv;
     }
     
+    //Utilizado para decodificar as palavras enviadas pelos outros jogadores, utilizado os inteiros para procurar na HashMap a palavra.
     public LinkedList<String> decodificarLetras(Map<Integer, String> pam, int[] palavras){
         LinkedList<String> plv = new LinkedList<>();
         

@@ -52,6 +52,7 @@ public class ControllerServidor {
         return s;
     }
     
+    //Verifica a quantidade de jogadores na sala para permitir ou não que um jogador entre.
     public Sala entrarSala(int num, Jogadores j){
         Sala s = iteratorSalas(num);
         LinkedList<Jogadores> jogadores = s.getJogadores();
@@ -65,6 +66,7 @@ public class ControllerServidor {
         return s;
     }
     
+    //Remove um jogador da sala, caso o mesmo tenha se desconectado.
     public void removeJogadorSala(Jogadores j, int numSala){
         Sala s = iteratorSalas(numSala); //Recebe a sala informada.
         removeJogador(s, j);

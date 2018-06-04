@@ -41,6 +41,7 @@ public class Resultado extends javax.swing.JDialog {
         fecharDialogo();
     }
     
+    //Inicia a tela informando que está sendo feito o calculo de pontos.
     private void configs(){
         calculando = true;
         new Thread(){
@@ -66,6 +67,9 @@ public class Resultado extends javax.swing.JDialog {
         
     }
     
+    //cria um Thread para anular as palavras iguais usando os códigos das letras
+    //Em seguida decodifica as letras de cada jogador e por fim calcula os pontos.
+    //Depois é feita a ordenação da lista e a listagem de ordem decrescente de modo que o jogador com maior ponto seja o primeiro.
     public void calculaPontos(){
         new Thread(){
             @Override
@@ -95,6 +99,7 @@ public class Resultado extends javax.swing.JDialog {
         c.calcularPontos(s);
     }
     
+    //Lista os jogadores na tabela com colocação, nome e pontos.
     private void listaVencedor(){
         Iterator itera = s.getJogadores().iterator();
         while (itera.hasNext()) {
@@ -117,6 +122,7 @@ public class Resultado extends javax.swing.JDialog {
         fecharDialogo();
     }
     
+    //Após a listagem de colocação, é iniciada uma contagem para fechar a janela de resultador e iniciar nova partida.
     public void fecharDialogo(){
         boolean fechar = false;
         new Thread(){
